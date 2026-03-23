@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MatdaanSecure | Voting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<h2>MatdaanSecure Voting Page</h2>
+
+<button id="voteBtn" disabled>Vote Now</button>
+<p id="status">Waiting for admin to enable voting...</p>
+
+<script type="module">
+  // ================= FIREBASE IMPORTS =================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+  // ================= FIREBASE CONFIG =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEoerP_xiqcZMkIc6I83Kka6l3OI9CetQ",
+    authDomain: "matdaan-d1486.firebaseapp.com",
+    projectId: "matdaan-d1486",
+    storageBucket: "matdaan-d1486.firebasestorage.app",
+    messagingSenderId: "484649301509",
+    appId: "1:484649301509:web:c61b2a4720343cb3dc0e6c"
+  };
+
+  // ================= INIT =================
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const messaging = getMessaging(app);
+
+  const voteBtn = document.getElementById("voteBtn");
+  const statusText = document.getElementById("status");
+
+  // ================= SERVICE WORKER REGISTER =================
+ if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/static/firebase-messaging-sw.js")
+    .then(() => console.log("Service Worker registered"));
+}
+
+  // ================= REQUEST NOTIFICATION PERMISSION =================
+  async function setupNotifications() {
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      console.warn("Notification permission denied");
+      return;
+    }
+
+    const token = await getToken(messaging, {
+      vapidKey: "BGIoXD73JehGErbGus85Td7W_QCTydDV1CnIALOMDXYaRbKzFYGJ5H3Iu2cN_cZrHIAhUGiZrjBXgF-I9pNZpQI"
+    });
+
+    console.log("FCM Token:", token);
+
+    // SAVE TOKEN IN FIRESTORE
+    await setDoc(
+      doc(db, "users", "demoUser"),   // replace with actual user ID
+      { fcmToken: token },
+      { merge: true }
+    );
+  }
+
+  setupNotifications();
+
+  // ================= FOREGROUND NOTIFICATION =================
+  onMessage(messaging, payload => {
+    alert(payload.notification.title + "\n" + payload.notification.body);
+  });
+
+  // ================= FIRESTORE LIVE STATUS LISTENER =================
+  onSnapshot(doc(db, "election", "votingStatus"), snap => {
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    if (data.isVotingAllowed) {
+      voteBtn.disabled = false;
+      statusText.innerText = "Voting is enabled!";
+    } else {
+      voteBtn.disabled = true;
+      statusText.innerText = "Waiting for admin to enable voting...";
+    }
+  });
+</script>
+
+</body>
+</html>

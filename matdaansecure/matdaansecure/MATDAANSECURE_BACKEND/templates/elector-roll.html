@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Elector Roll - MATDAANSECURE</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #111827;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        /* ===== APP BAR (UNCHANGED) ===== */
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 64px;
+            background: #ffffff; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); z-index: 3000;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-left img { width: 38px; height: 38px; }
+        .header-left span { font-size: 22px; font-weight: 700; color: #1E3A8A; }
+        .header-right button {
+            background: #1E3A8A; color: #ffffff; border: none;
+            padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+        }
+        .header-right button:hover { background: #2563EB; }
+
+        /* ===== BACKGROUND CHAKRA ===== */
+        .chakra-bg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 500px; height: 500px; opacity: 0.05;
+            animation: spin 60s linear infinite; pointer-events: none; z-index: 0;
+        }
+        @keyframes spin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            position: relative; z-index: 1; max-width: 1100px;
+            margin: 20px auto; background: rgba(255, 255, 255, 0.95);
+            padding: 40px; border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 { text-align: center; color: #1E3A8A; font-size: 2.2rem; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; color: #6B7280; margin-bottom: 30px; }
+
+        /* ===== CONTROLS ===== */
+        .search-sort {
+            display: flex; gap: 15px; margin-bottom: 25px;
+            background: #f9fafb; padding: 15px; border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        input[type="text"] {
+            flex: 1; padding: 12px 16px; border: 1.5px solid #d1d5db;
+            border-radius: 8px; outline: none; transition: 0.2s; font-size: 15px;
+        }
+        input[type="text"]:focus { border-color: #1E3A8A; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
+        
+        .btn-sort {
+            background: #0EA5E9; color: white; border: none;
+            padding: 0 24px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-sort:hover { background: #0284c7; transform: translateY(-1px); }
+
+        /* ===== TABLE STYLING ===== */
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7eb; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th {
+            background: #F8FAFC; color: #1E3A8A; font-weight: 600;
+            text-align: left; padding: 16px; border-bottom: 2px solid #e5e7eb;
+            text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em;
+        }
+        td { padding: 16px; border-bottom: 1px solid #f3f4f6; color: #374151; font-size: 15px; }
+        tr:hover { background-color: #f9fafb; }
+        
+        /* Badge for ID */
+        .voter-id {
+            background: #E0F2FE; color: #0369A1; padding: 4px 10px;
+            border-radius: 6px; font-family: monospace; font-weight: bold;
+        }
+
+        /* ===== FOOTER & PAGINATION ===== */
+        .footer-tools {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 25px; padding-top: 20px; border-top: 1px solid #e5e7eb;
+        }
+        .info { font-size: 14px; color: #6B7280; }
+
+        .pagination { display: flex; gap: 8px; }
+        .pagination button {
+            border: 1px solid #d1d5db; background: white; color: #374151;
+            width: 38px; height: 38px; border-radius: 8px; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .pagination button.active {
+            background: #1E3A8A; color: white; border-color: #1E3A8A;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .pagination button:hover:not(.active) { background: #f3f4f6; }
+    </style>
+</head>
+
+<body>
+
+<div class="app-header">
+    <div class="header-left">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+        <span>MATDAANSECURE</span>
+    </div>
+    <div class="header-right">
+        <button onclick="window.location.href='/home'">← Back to Home</button>
+    </div>
+</div>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" class="chakra-bg">
+
+<div class="container">
+    <h1>Elector Roll</h1>
+    <p class="subtitle">Official registry of eligible citizens for the current term.</p>
+
+    <div class="search-sort">
+        <input type="text" id="searchInput" placeholder="Search by name or ID..." oninput="resetAndRender()">
+        <button class="btn-sort" onclick="sortAlphabetically()">Sort A–Z</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="voterTable">
+            <thead>
+                <tr>
+                    <th>Voter ID</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <div class="footer-tools">
+        <div class="info" id="infoText">Loading data...</div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<script>
+let voters = [];
+let currentPage = 1;
+const rowsPerPage = 8;
+
+// FETCH LIVE DATA FROM FLASK
+async function fetchVoters() {
+    try {
+        const response = await fetch('/api/get_voters');
+        voters = await response.json();
+        renderTable();
+    } catch (error) {
+        console.error("Error fetching voters:", error);
+        document.getElementById("infoText").textContent = "Failed to load voter data.";
+    }
+}
+
+function resetAndRender(){
+    currentPage = 1;
+    renderTable();
+}
+
+function renderTable(){
+    const tbody = document.querySelector("#voterTable tbody");
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    
+    const filtered = voters.filter(v => 
+        v.name.toLowerCase().includes(search) || 
+        v.id.toString().toLowerCase().includes(search)
+    );
+    
+    const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+    tbody.innerHTML = "";
+
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedItems = filtered.slice(start, end);
+
+    if(paginatedItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color: #9CA3AF;">No voters found matching your search.</td></tr>`;
+    }
+
+    paginatedItems.forEach(v => {
+        tbody.innerHTML += `
+            <tr>
+                <td><span class="voter-id">${v.id}</span></td>
+                <td style="font-weight:600;">${v.name}</td>
+                <td>${v.email}</td>
+                <td>${v.phone}</td>
+            </tr>`;
+    });
+
+    document.getElementById("infoText").textContent = 
+        `Showing ${paginatedItems.length} of ${filtered.length} total voters`;
+
+    renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+    const container = document.getElementById("pagination");
+    container.innerHTML = "";
+    
+    if(totalPages <= 1) return;
+
+    for(let i = 1; i <= totalPages; i++){
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if(i === currentPage) btn.classList.add("active");
+        btn.onclick = () => { currentPage = i; renderTable(); window.scrollTo(0,0); };
+        container.appendChild(btn);
+    }
+}
+
+function sortAlphabetically(){
+    voters.sort((a, b) => a.name.localeCompare(b.name));
+    resetAndRender();
+}
+
+// Initial Load
+fetchVoters();
+</script>
+</body>
+</html>

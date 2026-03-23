@@ -1,0 +1,158 @@
+Name: Anita Deshmukh
+Candidate: C001
+Age: 46
+Education: M.A. in Political Science
+Experience: 15 years in public administration and social development
+Party: Progressive India
+Symbol: 🪷 Lotus
+Vision: Inclusive development with strong public institutions and social equality
+Top Priorities:
+Education reform
+Healthcare accessibility
+Women empowerment
+Social welfare programs
+
+Name: Akash Mehta
+Candidate: C002
+Age: 38
+Education: MBA (Finance & Public Policy)
+Experience: 10 years as policy analyst and youth leader
+Party: People's Voice
+Symbol: 🗣️ Microphone
+Vision: Transparent governance driven by citizen participation
+Top Priorities:
+Youth employment
+Government transparency
+Startup & innovation support
+Digital public services
+
+Name: Sunita Raut
+Candidate: C003
+Age: 44
+Education: M.Sc. in Economics
+Experience: 14 years in rural development and women self-help programs
+Party: United Growth
+Symbol: 🌾 Wheat Sheaf
+Vision: Balanced economic growth reaching rural and urban communities
+Top Priorities:
+Rural development
+Farmer welfare
+Microfinance support
+Women-led enterprises
+
+Name: Dilip Mehra
+Candidate: C004
+Age: 55
+Education: LLB (Bachelor of Law)
+Experience: 25 years as legal consultant and public rights advocate
+Party: National Reform
+Symbol: ⚖️ Balance Scale
+Vision: Strong rule of law and corruption-free governance
+Top Priorities:
+Legal reforms
+Anti-corruption measures
+Judicial efficiency
+Citizen rights protection
+
+Name: Vinod Shetty
+Candidate: C005
+Age: 49
+Education: B.Com + Diploma in Cooperative Management
+Experience: 18 years in cooperative societies and local governance
+Party: Democratic Front
+Symbol: 🤝 Handshake
+Vision: Grassroots democracy with community-driven decision making
+Top Priorities:
+Cooperative sector growth
+Local governance empowerment
+Small business support
+Public infrastructure improvement
+
+Name: Rohan Kulkarni
+Candidate: C006
+Age: 42
+Education: M.Tech in Civil Engineering
+Experience: 12 years as Urban Development Consultant
+Party: Green Future Party
+Symbol: 🌱 Sapling
+Vision: Sustainable cities with smart infrastructure and clean energy
+Top Priorities:
+Renewable energy adoption
+Smart city planning
+Water conservation
+Pollution control
+
+C007
+Name: Pooja Nair
+Candidate: C007
+Age: 35
+Education: MBA (Public Policy)
+Experience: 8 years in NGO & Women Empowerment Programs
+Party: Social Justice Alliance
+Symbol: ✊ Raised Fist
+Vision: Inclusive growth with equal opportunities for all
+Top Priorities:
+Women safety & empowerment
+Education reforms
+Skill development
+Social welfare schemes
+
+C008
+Name: Arjun Patil
+Candidate: C008
+Age: 50
+Education: LLB (Law)
+Experience: 20 years as Legal Advisor & Activist
+Party: Citizens First Party
+Symbol: ⚖️ Balance Scale
+Vision: Transparent governance and strong legal systems
+Top Priorities:
+Anti-corruption laws
+Judicial reforms
+Citizen rights protection
+Police accountability
+
+C009
+Name: Neha Verma
+Candidate: C009
+Age: 29
+Education: B.Sc IT
+Experience: 6 years as Tech Entrepreneur
+Party: Digital India Movement
+Symbol: 💻 Computer
+Vision: A digitally empowered and technologically advanced nation
+Top Priorities:
+Digital governance
+Startup support
+Cybersecurity
+Tech education
+
+C010 (NOTA)
+Name: NOTA (None of the Above)
+Candidate: C010
+Age: N/A
+Education: N/A
+Experience: N/A
+Party: Independent
+Symbol: 🚫 Ballot Cross
+Vision: Voter’s right to reject all candidates
+Top Priorities:
+Electoral transparency
+Voter freedom
+Democratic accountability
+Fair elections
+
+C011
+Name: Vikram Sethi 
+Candidate: C002 
+Age: 39 
+Education: B.Tech in Civil Engineering 
+Experience: 12 years in Urban Planning and Infrastructure Management 
+Party: Navnirman Parishad 
+Symbol: 💡 (Electric Bulb) 
+Vision: Smart, sustainable urban living with a focus on digitizing public services.
+Top Priorities:
+Infrastructure: Modernizing drainage and road networks.
+Digital Governance: Single-window online clearance for citizen services.
+Clean Energy: Subsidized solar panel installation for residential colonies.
+Public Safety: Enhanced CCTV coverage and community policing.

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login - MATDAANSECURE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;}
+body{
+  background:linear-gradient(to bottom right,#ffffff,#f9fafb);
+  color:#111827;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ===== APP BAR ===== */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;   
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 3000;
+}
+.header-left{ display: flex; align-items: center; gap: 12px; }
+.header-left img{ width: 38px; height: 38px; }
+.header-left span{ font-size: 22px; font-weight: 700; color: #1E3A8A; }
+.header-right button{ background: #1E3A8A; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+
+/* ===== TOAST NOTIFICATIONS ===== */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+.toast {
+    min-width: 320px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    background: #fff;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInDown 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards, fadeOut 0.5s ease 2.5s forwards;
+    border-left: 6px solid #ddd;
+}
+.toast.success { border-color: #16A34A; color: #16A34A; }
+.toast.error { border-color: #EF4444; color: #EF4444; }
+.toast.warning { border-color: #F59E0B; color: #B45309; }
+
+@keyframes slideInDown { from { transform: translateY(-120%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-20px); } }
+
+/* ===== SHAKE ANIMATION ===== */
+.shake { animation: shakeAnim 0.4s ease-in-out; }
+@keyframes shakeAnim {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+}
+
+/* ===== BACKGROUND & CARDS ===== */
+.chakra-bg{ position:fixed; top:50%;left:50%; transform:translate(-50%,-50%); width:15cm;height:15cm; opacity:0.04; animation:spin 20s linear infinite; pointer-events:none; }
+@keyframes spin{0%{transform:translate(-50%,-50%) rotate(0);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+h1{font-size:2rem;margin-bottom:20px;color:#1E3A8A;font-weight:bold;z-index:1;}
+
+.card-container{width:350px; height:280px; z-index:10; position:relative;}
+.card-face{
+  background:white; border-left:5px solid #0EA5E9; border-radius:10px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1); padding:25px; text-align:center;
+}
+.card-face input{ width:100%;padding:10px;margin:10px 0; border:1px solid #d1d5db;border-radius:6px;outline:none; }
+.btn{ background:#1E3A8A;color:white;padding:10px 20px; border:none;border-radius:6px;cursor:pointer; width:100%;margin-top:8px;font-weight:600; transition: 0.2s; }
+.btn:hover{background:#2563EB;transform:translateY(-2px);}
+
+/* OTP MODAL */
+.otp-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(2px); }
+.otp-card-theme{ width:100%; max-width:380px; background:#ffffff; border-radius:20px; padding:30px 25px; border-top:5px solid #1E3A8A; box-shadow:0 15px 50px rgba(0,0,0,0.2); }
+.otp-actions{ display:flex; gap:12px; margin-top:20px; }
+.otp-actions button{ flex:1; padding:12px; border:none; border-radius:10px; font-weight:600; cursor:pointer; }
+#resendBtn{ background:#E5E7EB; color:#6B7280; }
+#resendBtn:enabled{ background:#1E3A8A; color:#fff; }
+.verify-btn{ background:#16A34A; color:white; }
+.hidden { display: none !important; }
+
+/* Hidden honeypot fields to prevent autofill */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+</style>
+</head>
+
+<body onload="clearFields()">
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+
+<h1>🔑 Login Portal</h1>
+
+<div class="chakra-bg">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" width="100%" height="100%">
+</div>
+
+<div class="card-container" id="loginCard">
+  <div class="card-face">
+     <input class="visually-hidden" type="text" name="fake-user">
+     <input class="visually-hidden" type="password" name="fake-pass">
+     
+     <form onsubmit="return false;" autocomplete="off">
+        <input type="text" id="loginUsername" placeholder="Phone Number" required maxlength="10" autocomplete="one-time-code">
+        <input type="password" id="loginPassword" placeholder="Password" required autocomplete="new-password">
+        <button type="button" class="btn" onclick="login()">Login</button>
+        <button type="button" class="btn" style="background:#6b7280" onclick="location.href='home'">Cancel</button>
+<p style="margin-top:12px;font-size:13px;">
+  <a href="#" id="forgotLink" style="color:#1E3A8A;font-weight:600;">Forgot Password?</a>
+</p>
+     </form>
+  </div>
+</div>
+
+<div id="otpBox" class="otp-modal hidden">
+  <div class="otp-card-theme" id="otpCard">
+    <h3 style="color:#1E3A8A;margin-bottom:8px;">🔔 SMS Delivery Report</h3>
+    <p style="font-size:14px; color:#6B7280;">We have sent a One-Time Password (OTP) to: <span id="maskedPhone" style="font-weight:700; color:#111827;"></span></p>
+
+    <div style="background:#EEF2FF; border-left:4px solid #1E3A8A; border-radius:12px; padding:14px; margin:15px 0; color:#1E3A8A;">
+      <small>For demo purpose only:</small><br>
+      Your OTP:<span id="demoOTP" style="font-size:22px; font-weight:bold; letter-spacing:6px;">****</span>
+    </div>
+
+    <input type="text" id="otpInput" maxlength="4" placeholder="Enter OTP" autocomplete="off" style="width:100%;padding:14px;border-radius:10px;border:1px solid #d1d5db;font-size:22px;text-align:center;letter-spacing:8px;">
+
+    <p id="timerText" style="margin-top:10px;color:#EF4444;font-weight:600; text-align:center;">Time remaining: 15s</p>
+
+    <div class="otp-actions">
+      <button id="resendBtn" onclick="resendOTP()" disabled>Resend OTP</button>
+      <button onclick="verifyOTP()" class="verify-btn">Verify OTP</button>
+    </div>
+  </div>
+</div>
+<div class="otp-modal hidden" id="forgotModal">
+  <div class="otp-card-theme">
+    <h3 style="color:#1E3A8A;margin-bottom:10px;">🔐 Reset Password</h3>
+    <p style="font-size:14px;color:#6B7280;margin-bottom:12px;">
+      Enter your registered email to receive a reset link.
+    </p>
+
+    <input type="email" id="forgotEmail" placeholder="Enter your email"
+      style="width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;">
+
+    <div id="resetLinkBox" class="hidden"
+      style="margin-top:14px;background:#EEF2FF;padding:12px;border-radius:10px;text-align:center;">
+      <small style="color:#1E3A8A;">Reset link generated:</small><br>
+      <a id="resetLink" href="#" style="font-weight:700;color:#1E3A8A;">Click here to reset</a>
+    </div>
+
+    <div class="otp-actions">
+      <button onclick="closeForgot()">Cancel</button>
+      <button class="verify-btn" onclick="generateReset()">Get Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentOTP = "";
+let timerInterval;
+let otpPhone = "";
+let otpExpired = false;
+
+// 🔵 CLEAR FIELDS ON LOAD
+function clearFields() {
+    document.getElementById("loginUsername").value = "";
+    document.getElementById("loginPassword").value = "";
+}
+
+// 🟢 CUSTOM TOAST FUNCTION
+function showToast(message, type = "success") {
+    let container = document.querySelector(".toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "toast-container";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    let icon = type === "success" ? "✅" : (type === "error" ? "❌" : "⚠️");
+    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = "fadeOut 0.5s ease forwards";
+        setTimeout(() => toast.remove(), 500);
+    }, 2500);
+}
+
+// 🟡 SHAKE EFFECT FUNCTION
+function triggerShake(elementId) {
+    const el = document.getElementById(elementId);
+    el.classList.add('shake');
+    setTimeout(() => el.classList.remove('shake'), 400);
+}
+
+// -------------------- TIMER --------------------
+function startTimer(){
+    let time = 15;
+    const timerText = document.getElementById("timerText");
+    const resendBtn = document.getElementById("resendBtn");
+    otpExpired = false;
+    resendBtn.disabled = true;
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(()=>{
+        timerText.innerText = `Time remaining: ${time}s`;
+        if(time <= 0){
+            clearInterval(timerInterval);
+            otpExpired = true;
+            timerText.innerText = "OTP expired ❌";
+            resendBtn.disabled = false;
+            showToast("OTP expired! Please resend.", "warning");
+        }
+        time--;
+    }, 1000);
+}
+
+// -------------------- LOGIN --------------------
+async function login(){
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if(!username || !password){
+    showToast("Please fill all fields", "error");
+    triggerShake("loginCard");
+    return;
+  }
+
+  if(!/^\d{10}$/.test(username)){
+    showToast("Enter a valid 10-digit phone number", "error");
+    triggerShake("loginCard");
+    return;
+  }
+
+  try {
+    // ✅ STEP 1: VERIFY PASSWORD
+    const loginRes = await fetch("http://127.0.0.1:5001/login", {
+      method: "POST",
+      credentials: "include",   // 🔥 REQUIRED
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: username,
+        password: password
+      })
+    });
+
+    const loginData = await loginRes.json();
+
+    if(loginData.status !== "password_ok"){
+      showToast("Invalid phone or password", "error");
+      triggerShake("loginCard");
+      return;
+    }
+
+    // ✅ STEP 2: SEND OTP (ONLY AFTER PASSWORD OK)
+    const otpRes = await fetch("http://127.0.0.1:5001/send_otp", {
+      method: "POST",
+      credentials: "include",   // 🔥 REQUIRED
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: username })
+    });
+
+    const otpData = await otpRes.json();
+
+    if(otpData.status === "sent"){
+      otpPhone = username;
+      currentOTP = otpData.otp;
+      document.getElementById("otpBox").classList.remove("hidden");
+      document.getElementById("maskedPhone").innerText = "+91••••••" + username.slice(-4);
+      document.getElementById("demoOTP").innerText = otpData.otp;
+      startTimer();
+      showToast("OTP sent to your mobile", "success");
+    } else {
+      showToast("Failed to send OTP", "error");
+      triggerShake("loginCard");
+    }
+
+  } catch(e){
+    showToast("Server connection failed", "error");
+  }
+}
+
+// -------------------- VERIFY OTP --------------------
+async function verifyOTP() {
+    const entered = document.getElementById("otpInput").value.trim();
+    if (!entered) {
+        showToast("Please enter the OTP", "warning");
+        triggerShake("otpCard");
+        return;
+    }
+    if (otpExpired) {
+        showToast("This OTP has expired", "error");
+        triggerShake("otpCard");
+        return;
+    }
+
+    try {
+       const res = await fetch("http://127.0.0.1:5001/verify_otp", {
+    method: "POST",
+    credentials: "include",   // 🔥 THIS IS THE FIX
+    headers: { 
+        "Content-Type": "application/json" 
+    },
+    body: JSON.stringify({ 
+        phone: otpPhone, 
+        otp: entered 
+    })
+});
+
+        const data = await res.json();
+
+        if (data.status === "success") {
+            localStorage.setItem("voter_id", data.voter_id);
+            showToast("Identity Verified! Logging in...", "success");
+            setTimeout(() => window.location.href = "/home", 1500);
+        } else {
+            showToast("Incorrect OTP. Please check again.", "error");
+            triggerShake("otpCard");
+        }
+    } catch (err) {
+        showToast("Verification server error", "error");
+    }
+}
+
+// -------------------- RESEND --------------------
+async function resendOTP(){
+    showToast("Resending code...", "warning");
+    const res = await fetch("http://127.0.0.1:5001/send_otp",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ phone: otpPhone })
+    });
+    const data = await res.json();
+    if(data.status === "sent"){
+        currentOTP = data.otp;
+        document.getElementById("demoOTP").innerText = data.otp;
+        document.getElementById("otpInput").value = "";
+        startTimer();
+        showToast("New OTP sent!", "success");
+    }
+}
+// -------------------- FORGOT PASSWORD --------------------
+const forgotLink = document.getElementById("forgotLink");
+const forgotModal = document.getElementById("forgotModal");
+const resetLinkBox = document.getElementById("resetLinkBox");
+const resetLink = document.getElementById("resetLink");
+
+forgotLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    forgotModal.classList.remove("hidden");
+    resetLinkBox.classList.add("hidden");
+});
+
+function closeForgot(){
+    forgotModal.classList.add("hidden");
+}
+
+function generateReset(){
+    const email = document.getElementById("forgotEmail").value.trim();
+
+    if(!email || !email.includes("@")){
+        showToast("Enter a valid email", "error");
+        return;
+    }
+
+    // DEMO reset link (replace with backend later)
+    resetLink.href = `reset-password.html?email=${encodeURIComponent(email)}`;
+    resetLinkBox.classList.remove("hidden");
+    showToast("Reset link generated", "success");
+}
+
+</script>
+</body>
+</html>

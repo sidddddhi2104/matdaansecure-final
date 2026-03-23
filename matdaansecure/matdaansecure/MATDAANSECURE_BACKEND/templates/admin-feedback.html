@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Feedback Panel</title>
+<style>
+  * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif;}
+  body {
+    background: linear-gradient(to bottom right,#ffffff,#f9fafb);
+    color:#111827;
+    padding:20px;
+  }
+  h1 {
+    color:#1E3A8A;
+    text-align:center;
+    margin-bottom:20px;
+  }
+.status-text.PENDING {
+  color: #ca8a04; /* amber */
+  font-weight: 600;
+}
+
+.status-text.APPROVED {
+  color: #16a34a; /* green */
+  font-weight: 700;
+}
+
+.status-text.REJECTED {
+  color: #dc2626; /* red */
+  font-weight: 700;
+}
+/* ===== COMMON APP BAR ===== */
+  .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;   /* ⬅ reduce from 24px */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 3000;
+  box-sizing: border-box; /* ⬅ VERY IMPORTANT */
+}
+
+
+    .header-left{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img{
+      width: 38px;
+      height: 38px;
+    }
+
+    .header-left span{
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+
+    .header-right button{
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .header-right button:hover{
+      background: #2563EB;
+    }
+ 
+  /* Tabs */
+  .tabs {
+    display:flex;
+    justify-content:center;
+    margin-bottom:20px;
+    gap:10px;
+  }
+  .tab {
+    background:#E5E7EB;
+    color:#1E3A8A;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.2s ease;
+    position:relative;
+  }
+  .tab.active {
+    background:#1E3A8A;
+    color:white;
+  }
+  .tab:hover {
+    background:#2563EB;
+    color:white;
+  }
+  .tab .badge {
+    position:absolute;
+    top:-6px;
+    right:-10px;
+    background:red;
+    color:white;
+    font-size:11px;
+    border-radius:50%;
+    padding:2px 6px;
+  }
+
+  /* Cards */
+  #feedback-container {
+    max-width:700px;
+    margin:0 auto;
+  }
+  .feedback-card {
+    background:#ffffff;
+    border-radius:10px;
+    padding:15px 20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom:15px;
+    transition:background 0.3s ease, transform 0.2s;
+  }
+  .feedback-card.unread {
+    background:#fff6cc;
+  }
+  .feedback-card:hover {
+    transform:translateY(-3px);
+  }
+  .feedback-card h3 {
+    color:#1E3A8A;
+    margin-bottom:8px;
+  }
+  .feedback-card p { margin:4px 0; }
+  .actions {
+    margin-top:10px;
+  }
+  .actions button {
+    background:#1E3A8A;
+    color:white;
+    border:none;
+    border-radius:6px;
+    padding:6px 10px;
+    margin-right:8px;
+    cursor:pointer;
+    transition:0.2s ease;
+  }
+  .actions button:hover {
+    background:#2563EB;
+  }
+
+.btn-approve {
+  background-color: #16a34a; /* green */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-approve:hover {
+  background-color: #15803d;
+}
+
+.btn-reject {
+  background-color: #dc2626; /* red */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-reject:hover {
+  background-color: #b91c1c;
+}
+
+
+  /* Modal styles */
+  #imageModal {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.85); justify-content:center; align-items:center;
+    flex-direction:column; z-index:2000;
+  }
+  #modalImage {
+    max-width:90%; max-height:85%; border-radius:10px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3); transition:transform 0.2s ease;
+  }
+  #closeModal {
+    position:absolute; top:20px; right:30px; font-size:32px; color:white;
+    cursor:pointer; font-weight:bold;
+  }
+  .zoom-controls button {
+    font-size:20px; padding:6px 14px; border:none; border-radius:8px;
+    cursor:pointer; margin:0 5px;
+  }
+</style>
+</head>
+<body>
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='admin-dashboard'">← Back to Home</button>
+  </div>
+</div>
+
+<h1>Admin Feedback Panel</h1>
+
+<div class="tabs">
+  <div class="tab active" id="tab-complaint" onclick="switchTab('complaint')">
+    Complaints <span class="badge" id="badge-complaint" style="display:none;">0</span>
+  </div>
+  <div class="tab" id="tab-correction" onclick="switchTab('correction')">
+    Corrections <span class="badge" id="badge-correction" style="display:none;">0</span>
+  </div>
+  <div class="tab" id="tab-suggestion" onclick="switchTab('suggestion')">
+    Suggestions <span class="badge" id="badge-suggestion" style="display:none;">0</span>
+  </div>
+</div>
+
+<div id="feedback-container"></div>
+
+<!-- 🖼️ Image Viewer Modal -->
+<div id="imageModal">
+  <span id="closeModal">&times;</span>
+  <div class="zoom-controls">
+    <button onclick="zoomIn()">🔍+</button>
+    <button onclick="zoomOut()">🔍−</button>
+    <button onclick="resetZoom()">↩ Reset</button>
+  </div>
+  <img id="modalImage" src="">
+</div>
+
+<script>
+let currentTab = "complaint";
+
+/* ================= TAB SWITCH ================= */
+function switchTab(tabName) {
+  currentTab = tabName;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(`tab-${tabName}`).classList.add("active");
+  loadFeedbacks();
+}
+
+/* ================= LOAD FEEDBACKS ================= */
+function loadFeedbacks() {
+  const container = document.getElementById("feedback-container");
+  container.innerHTML = "Loading...";
+
+  fetch("http://127.0.0.1:5001/admin/get_all_feedbacks")
+    .then(res => res.json())
+    .then(data => {
+      container.innerHTML = "";
+
+      let items = [];
+      if (currentTab === "complaint") items = data.complaints || [];
+      if (currentTab === "correction") items = data.corrections || [];
+      if (currentTab === "suggestion") items = data.suggestions || [];
+
+      if (items.length === 0) {
+        container.innerHTML =
+          `<p style="text-align:center;color:#64748b;">No ${currentTab} records.</p>`;
+        updateBadges(data);
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "feedback-card";
+
+        /* -------- CORRECTIONS -------- */
+        if (currentTab === "correction") {
+          card.innerHTML = `
+            <h3>CORRECTION REQUEST</h3>
+            <p><b>Voter ID:</b> ${item.voter_id}</p>
+            <p><b>Reference ID:</b> ${item.reference_id}</p>
+            <p><b>Name:</b> ${item.fullname}</p>
+            <p><b>Field:</b> ${item.field_name}</p>
+            <p><b>Old Value:</b> ${item.old_value}</p>
+            <p><b>New Value:</b> ${item.new_value}</p>
+            <p>
+  <b>Status:</b>
+  <span class="status-text ${item.status}">
+    ${item.status}
+  </span>
+</p>
+
+            ${
+              item.status === "PENDING"
+                ? `<div class="actions">
+  <button class="btn-approve"
+          onclick="approveCorrection('${item.reference_id}', this)">
+    Approve
+  </button>
+
+  <button class="btn-reject"
+          onclick="rejectCorrection('${item.reference_id}', this)">
+    Reject
+  </button>
+</div>`
+                : ""
+            }
+          `;
+        }
+
+        /* -------- COMPLAINTS -------- */
+       if (currentTab === "complaint") {
+  card.innerHTML = `
+    <h3>COMPLAINT</h3>
+    <p><b>Reference ID:</b> ${item.reference_id}</p>
+    <p><b>Voter ID:</b> ${item.voter_id}</p>
+    <p><b>Type:</b> ${item.type}</p>
+    <p><b>Message:</b> ${item.message}</p>
+    <p>
+  <b>Status:</b>
+  <span class="status-text ${item.status}">
+    ${item.status}
+  </span>
+</p>
+
+    ${
+      item.status === "PENDING"
+        ? `<div class="actions">
+            <button class="btn-approve"
+              onclick="approveComplaint('${item.reference_id}', this)">
+              Approve
+            </button>
+            <button class="btn-reject"
+              onclick="rejectComplaint('${item.reference_id}', this)">
+              Reject
+            </button>
+          </div>`
+        : ""
+    }
+  `;
+}
+
+
+        /* -------- SUGGESTIONS -------- */
+      if (currentTab === "suggestion") {
+  card.innerHTML = `
+    <h3>SUGGESTION</h3>
+    <p><b>Voter ID:</b> ${item.voter_id}</p>
+    <p><b>Reference ID:</b> ${item.reference_id}</p>
+    <p><b>Type:</b> ${item.type}</p>
+    <p><b>Message:</b> ${item.message}</p>
+    <p>
+  <b>Status:</b>
+  <span class="status-text ${item.status}">
+    ${item.status}
+  </span>
+</p>
+
+    ${
+      item.status === "PENDING"
+        ? `<div class="actions">
+            <button class="btn-approve"
+              onclick="approveSuggestion('${item.reference_id}', this)">
+              Approve
+            </button>
+            <button class="btn-reject"
+              onclick="rejectSuggestion('${item.reference_id}', this)">
+              Reject
+            </button>
+          </div>`
+        : ""
+    }
+  `;
+}
+
+container.appendChild(card);
+      });
+
+      updateBadges(data);
+    })
+    .catch(() => {
+      container.innerHTML = "Failed to load feedbacks";
+    });
+}
+
+/* ================= BADGES ================= */
+function updateBadges(data) {
+  setBadge("complaint", (data.complaints || []).filter(x => x.status === "PENDING").length);
+  setBadge("correction", (data.corrections || []).filter(x => x.status === "PENDING").length);
+  setBadge("suggestion", (data.suggestions || []).filter(x => x.status === "PENDING").length);
+}
+
+function setBadge(tab, count) {
+  const badge = document.getElementById(`badge-${tab}`);
+  if (!badge) return;
+  badge.style.display = count > 0 ? "inline-block" : "none";
+  badge.textContent = count;
+}
+
+/* ================= ACTIONS ================= */
+function markDone(btn, newStatus) {
+  const card = btn.closest(".feedback-card");
+
+  // update status text
+  const statusSpan = card.querySelector(".status-text");
+  statusSpan.textContent = newStatus;
+  statusSpan.className = `status-text ${newStatus}`;
+
+  // remove buttons
+  const actions = btn.parentElement;
+  actions.remove();
+}
+/* ================= CORRECTIONS ================= */
+function approveCorrection(referenceId, btn) {
+    fetch("http://127.0.0.1:5001/admin/approve_correction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference_id: referenceId })
+    })
+    .then(() => {
+        markDone(btn, "APPROVED");
+    });
+}
+
+function rejectCorrection(referenceId, btn) {
+    fetch("http://127.0.0.1:5001/admin/reject_correction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference_id: referenceId })
+    })
+    .then(() => {
+        markDone(btn, "REJECTED");
+    });
+}
+
+
+/* COMPLAINT */
+function approveComplaint(ref, btn) {
+    fetch("http://127.0.0.1:5001/admin/approve_complaint", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ reference_id: ref })
+    }).then(() => markDone(btn, "APPROVED", "green"));
+}
+
+function rejectComplaint(ref, btn) {
+    fetch("http://127.0.0.1:5001/admin/reject_complaint", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ reference_id: ref })
+    }).then(() => markDone(btn, "REJECTED", "red"));
+}
+
+/* SUGGESTION */
+function approveSuggestion(ref, btn) {
+    fetch("http://127.0.0.1:5001/admin/approve_suggestion", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ reference_id: ref })
+    }).then(() => markDone(btn, "APPROVED", "green"));
+}
+
+function rejectSuggestion(ref, btn) {
+    fetch("http://127.0.0.1:5001/admin/reject_suggestion", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ reference_id: ref })
+    }).then(() => markDone(btn, "REJECTED", "red"));
+}
+window.onload = loadFeedbacks;
+</script>
+
+</body>
+</html>

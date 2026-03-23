@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | MatdaanSecure</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+  
+  body{
+    background:linear-gradient(to right,#ffffff,#f9fafb);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    height:100vh;overflow-x: hidden;position:relative;color:#111827;
+    padding-top:80px;
+  }
+
+  .highlight-id {
+    background: #fff3cd;
+    color: #111;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  /* ===== APP BAR ===== */
+  .app-header {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 64px;
+    background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 3000;
+  }
+  .header-left{ display: flex; align-items: center; gap: 12px; }
+  .header-left img{ width: 38px; height: 38px; }
+  .header-left span{ font-size: 22px; font-weight: 700; color: #1E3A8A; }
+
+  /* ===== BACKGROUND CHAKRA ===== */
+  .chakra-bg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:15cm;height:15cm;opacity:0.04;z-index:0;animation:spin 20s linear infinite;pointer-events:none;}
+  @keyframes spin{0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+
+  /* ===== MAIN CONTAINER ===== */
+  .container{
+    background:#fff;border-radius:30px;box-shadow:0 5px 15px rgba(17,24,39,0.1);
+    position:relative;overflow:hidden;width:768px;max-width:100%;min-height:700px;z-index:1;
+  }
+  .container p{font-size:14px;margin:20px 0;}
+  .container a{color:#1E3A8A;font-size:13px;text-decoration:none;margin:15px 0 10px;cursor:pointer;}
+  .container button{
+    background:#1E3A8A;color:#fff;font-size:12px;padding:10px 45px;border:1px solid transparent;
+    border-radius:8px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-top:10px;cursor:pointer;
+    transition:background 0.3s ease;
+  }
+  .container button:hover{background:#2563EB;}
+  .container form{
+    background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;
+    padding:0 40px;height:100%;
+  }
+  .container input,.container select{
+    background:#f3f4f6;border:1px solid #e5e7eb;margin:8px 0;padding:10px 15px;font-size:13px;
+    border-radius:8px;width:100%;outline:none;color:#111827;
+  }
+
+  /* TOGGLE PANELS */
+  .toggle-panel button.hidden {
+    background: transparent; border: 1.8px solid #fff; color: #fff;
+    font-size: 13px; font-weight: 600; padding: 12px 0; width: 180px;
+    border-radius: 10px; margin: 10px 0; letter-spacing: 0.5px; cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .toggle-panel button.hidden:hover {
+    background: #fff; color: #1E3A8A; box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    transform: scale(1.03);
+  }
+
+  .form-container{position:absolute;top:0;height:100%;transition:all 0.6s ease-in-out;}
+  .sign-in{left:0;width:50%;z-index:2;}
+  .container.active .sign-in{transform:translateX(100%);}
+  .sign-up{left:0;width:50%;opacity:0;z-index:1;}
+  .container.active .sign-up{transform:translateX(100%);opacity:1;z-index:5;animation:move 0.6s;}
+  @keyframes move{0%,49.99%{opacity:0;z-index:1;}50%,100%{opacity:1;z-index:5;}}
+  
+  .toggle-container{position:absolute;top:0;left:50%;width:50%;height:100%;overflow:hidden;
+    transition:all 0.6s ease-in-out;border-radius:150px 0 0 100px;z-index:1000;}
+  .container.active .toggle-container{transform:translateX(-100%);border-radius:0 150px 100px 0;}
+  .toggle{
+    background:linear-gradient(to right,#0EA5E9,#1E3A8A);color:#fff;height:100%;position:relative;
+    left:-100%;width:200%;transform:translateX(0);transition:all 0.6s ease-in-out;
+  }
+  .container.active .toggle{transform:translateX(50%);}
+  .toggle-panel{
+    position:absolute;width:50%;height:100%;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;padding:0 30px;text-align:center;top:0;transition:all 0.6s ease-in-out;
+  }
+  .toggle-left{transform:translateX(-200%);}
+  .container.active .toggle-left{transform:translateX(0);}
+  .toggle-right{right:0;transform:translateX(0);}
+  .container.active .toggle-right{transform:translateX(200%);}
+
+  /* MODALS */
+  .modal{display:none;position:fixed;z-index:2000;left:0;top:0;width:100%;height:100%;
+    background:rgba(17,24,39,0.6);justify-content:center;align-items:center;animation:fadeIn 0.3s;}
+  .modal-content{
+    background:#fff;padding:30px;border-radius:20px;width:400px;max-width:90%;text-align:left;
+    box-shadow:0 15px 35px rgba(17,24,39,0.1);animation:slideIn 0.3s;color:#111827;
+  }
+  .modal-content h2{margin-bottom:20px;font-size:22px;color:#1E3A8A;}
+  .modal-buttons{display:flex;justify-content:flex-end;margin-top:25px;}
+  .modal-btn{padding:10px 20px;margin-left:10px;border:none;border-radius:8px;cursor:pointer;font-weight:600;}
+  .edit-btn{background:#f3f4f6;color:#111827;}
+  .confirm-btn{background:#0EA5E9;color:#fff;}
+  #genderImage{width:100px;height:100px;border-radius:50%;margin-bottom:15px;display:block;}
+
+  /* SUCCESS ANIMATION OVERLAY */
+  #successPopup {
+    position: fixed; inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    display: none; justify-content: center; align-items: center;
+    z-index: 9999; flex-direction: column;
+  }
+
+ .loader-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Loader ring stays behind tick */
+.loader-wrapper.active-loader::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 5px solid #e5e7eb;
+  border-top: 5px solid #1E3A8A;
+  border-radius: 50%;
+  animation: spin-loader 1s linear infinite;
+  z-index: 1;   /* behind tick */
+}
+
+
+  @keyframes spin-loader {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+#animationBox {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+/* FORCE SVG VISIBILITY */
+#animationBox svg {
+  width: 120px !important;
+  height: 120px !important;
+  display: block !important;
+}
+
+/* FORCE BLUE STROKE COLOR */
+#animationBox svg path {
+  stroke: #1E3A8A !important;
+  fill: none !important;
+  stroke-width: 8 !important;
+}
+
+
+  .status-text {
+    margin-top: 20px; font-size: 18px; font-weight: 600;
+    color: #1E3A8A; letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .progress-bar-container {
+    width: 250px; height: 6px; background: #e5e7eb;
+    border-radius: 10px; margin-top: 15px; overflow: hidden;
+  }
+  .progress-fill {
+    width: 0%; height: 100%; background: #1E3A8A;
+    transition: width 0.4s ease;
+  }
+
+  /* ALREADY REGISTERED POPUP */
+  .already-popup {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: none; justify-content: center; align-items: center; z-index: 10000;
+  }
+  .already-card {
+    background: #ffffff; padding: 30px; border-radius: 16px;
+    width: 340px; text-align: center; opacity: 0; transform: scale(0.8);
+    transition: all 0.3s ease-out;
+  }
+  .show-popup { opacity: 1 !important; transform: scale(1) !important; }
+  .already-card h2 { margin-bottom: 10px; color: #1E3A8A; }
+  .already-card p { font-size: 15px; color: #444; margin-bottom: 20px; }
+  .already-card button {
+    background: #1E3A8A; color: white; border: none; padding: 10px 24px;
+    border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes slideIn{from{transform:translateY(-50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  </style>
+</head>
+<body>
+
+  <div class="chakra-bg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" width="100%" height="100%">
+  </div>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO">
+    <span>MATDAANSECURE</span>
+  </div>
+</div>
+
+<div class="container" id="container">
+ <div class="form-container sign-up">
+      <form id="registerForm">
+        <h1 id="formTitle">Create Account</h1>
+        <span id="formSubtitle">or use your email for registration</span>
+        <div id="formFields"></div>
+        <button type="submit" id="submitBtn">Sign Up</button>
+      </form>
+</div>
+
+    <div class="form-container sign-in">
+      <form id="mainForm">
+        <h1>Register</h1>
+        <span>Fill your details below</span>
+        <input type="text" name="fullname" placeholder="Enter Full Name" required>
+        <input type="email" name="email" placeholder="Enter Email" required>
+        <input type="tel" name="phone" placeholder="Enter Phone Number" required>
+        <input type="number" name="age" placeholder="Enter Age" min="18" required>
+        <select name="gender" required>
+          <option value="" disabled selected>Select Gender</option>
+          <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+        </select>
+        <input type="text" name="voterID" id="mainVoterID" placeholder="Enter VoterID" value="V" maxlength="4" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirm" placeholder="Confirm Password" required>
+        <button type="submit">Register</button>
+        <p style="font-size:13px;margin-top:10px">
+          Already registered? <a href="login" style="color:#1E3A8A;cursor:pointer">Login</a>
+        </p>
+      </form>
+    </div>
+
+    <div class="toggle-container">
+      <div class="toggle">
+        <div class="toggle-panel toggle-left">
+          <h1 id="toggleTitle">Welcome Back!</h1>
+          <p id="toggleText">Enter your personal details to Participate in Democratic Process</p>
+          <button class="hidden" id="login">Register</button>
+        </div>
+        <div class="toggle-panel toggle-right">
+          <h1>Register as</h1>
+          <button class="hidden" id="nriregister">NRI Voter</button>
+          <button class="hidden" id="newregister">New Elector</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="confirmationModal">
+    <div class="modal-content">
+      <h2>Confirm Your Details</h2>
+      <img id="genderImage" src="" alt="Gender Image">
+      <div id="userOverview"></div>
+      <div class="modal-buttons">
+        <button id="editBtn" class="modal-btn edit-btn">Edit</button>
+        <button id="confirmBtn" class="modal-btn confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+<div id="successPopup">
+    <div class="loader-wrapper active-loader" id="loaderWrapper">
+        <div id="animationBox"></div>
+    </div>
+    <div class="status-text" id="statusText">Verifying Credentials...</div>
+    <div class="progress-bar-container">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+</div>
+
+<div id="alreadyPopup" class="already-popup">
+  <div class="already-card">
+    <h2>Already Registered</h2>
+    <p>You already have an account.<br>Please login to continue.</p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+      <button onclick="window.location.href='login';">Login</button>
+      <button style="background:#0EA5E9" onclick="handleUpdateFace()">Update Face Register</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
+
+<script>
+let alreadyShown = false;
+const container=document.getElementById('container');
+const nriBtn=document.getElementById('nriregister');
+const newBtn=document.getElementById('newregister');
+const loginBtn=document.getElementById('login');
+const formTitle=document.getElementById('formTitle');
+const formSubtitle=document.getElementById('formSubtitle');
+const formFields=document.getElementById('formFields');
+const submitBtn=document.getElementById('submitBtn');
+const toggleTitle=document.getElementById('toggleTitle');
+const toggleText=document.getElementById('toggleText');
+const modal=document.getElementById('confirmationModal');
+const userOverview=document.getElementById('userOverview');
+const editBtn=document.getElementById('editBtn');
+const confirmBtn=document.getElementById('confirmBtn');
+const genderImage=document.getElementById('genderImage');
+const popup=document.getElementById('successPopup');
+let currentFormType="main";
+
+// --- NAVIGATION LOGIC ---
+nriBtn.addEventListener('click',()=>{
+    currentFormType="nri";
+    container.classList.add("active");
+    formTitle.innerText="NRI Voter Registration";
+    formFields.innerHTML=`
+      <input type="text" name="fullname" placeholder="Full Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="number" name="age" placeholder="Enter Age" min="18" required>
+      <select name="gender" required>
+        <option value="" disabled selected>Select Gender</option>
+        <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+      </select>
+      <input type="tel" name="phone" placeholder="Phone Number (with country code)" required>
+      <input type="text" name="passport" placeholder="Passport Number" required>
+      <input type="text" name="address" placeholder="Overseas Address" required>
+      <input type="text" name="voterID" id="voterID" placeholder="Enter VoterID" value="V" maxlength="4" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="password" name="confirm" placeholder="Confirm Password" required>`;
+    applyVoterIDLogic();
+});
+
+newBtn.addEventListener('click',()=>{
+    currentFormType="new";
+    container.classList.add("active");
+    formTitle.innerText="New Elector Registration";
+    formFields.innerHTML=`
+      <input type="text" name="fullname" placeholder="Full Name" required>
+      <input type="text" name="parent" placeholder="Father's/Mother's Name" required>
+      <input type="number" name="age" placeholder="Enter Age" min="18" required>
+      <select name="gender" required>
+        <option value="" disabled selected>Select Gender</option>
+        <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+      </select>
+      <input type="date" name="dob" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+      <input type="text" name="address" placeholder="Address" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="password" name="confirm" placeholder="Confirm Password" required>`;
+});
+
+loginBtn.addEventListener('click',()=>{
+    currentFormType="main";
+    container.classList.remove("active");
+});
+
+function applyVoterIDLogic(){
+    const voterInputs=document.querySelectorAll("#voterID,#mainVoterID");
+    voterInputs.forEach(input=>{
+        if(input){
+            input.addEventListener("input",function(){
+                if(!this.value.startsWith("V"))this.value="V";
+                this.value="V"+this.value.slice(1).replace(/\D/g,"").slice(0,3);
+            });
+        }
+    });
+}
+applyVoterIDLogic();
+
+// --- FORM SUBMISSION ---
+["mainForm", "registerForm"].forEach(id => {
+  const form = document.getElementById(id);
+  if (!form) return;
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    const email = this.querySelector("input[name='email']")?.value || "";
+    const voterID = this.querySelector("input[name='voterID']")?.value || "";
+
+    try {
+      const checkResponse = await fetch("http://127.0.0.1:5001/check-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, voterID })
+      });
+      const checkResult = await checkResponse.json();
+
+      if (checkResult.status === "exists") {
+        if (alreadyShown) return;
+        alreadyShown = true;
+        const alreadyPopup = document.getElementById("alreadyPopup");
+        alreadyPopup.style.display = "flex";
+        alreadyPopup.querySelector(".already-card").classList.add("show-popup");
+        return;
+      }
+
+      const password = this.querySelector("input[name='password']").value;
+      const confirm = this.querySelector("input[name='confirm']").value;
+      if(password !== confirm){ alert("Passwords do not match!"); return; }
+
+      const inputs = this.querySelectorAll("input,select");
+      let overviewHTML = "";
+      let generatedVoterID = "";
+
+      inputs.forEach(input => {
+        if(input.type !== "password") {
+          const label = input.name ? input.name.charAt(0).toUpperCase() + input.name.slice(1) : input.placeholder;
+          overviewHTML += `<p><strong>${label}:</strong> ${input.value}</p>`;
+          if(label.toLowerCase() === "gender") {
+            if(input.value.toLowerCase() === "female") genderImage.src = "https://cdn-icons-png.flaticon.com/512/6997/6997662.png";
+            else if(input.value.toLowerCase() === "male") genderImage.src = "https://cdn-icons-png.flaticon.com/512/236/236831.png";
+            else genderImage.src = "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png";
+          }
+        }
+      });
+
+      if(currentFormType === "new") {
+        generatedVoterID = "V" + Math.floor(100 + Math.random() * 900);
+        overviewHTML += `<p class="highlight-id">Generated Voter ID: <strong>${generatedVoterID}</strong></p>`;
+      }
+
+      userOverview.innerHTML = overviewHTML;
+      modal.style.display = "flex";
+    } catch(err) { alert("Server error. Ensure Flask is running."); }
+  });
+});
+
+// --- FINAL CONFIRMATION ---
+confirmBtn.addEventListener("click", async () => {
+    const form = (currentFormType === "main") ? document.getElementById("mainForm") : document.getElementById("registerForm");
+    const formData = new FormData(form);
+    let voterID = formData.get("voterID");
+
+    if (currentFormType === "new") {
+        voterID = document.querySelector(".highlight-id strong")?.innerText || "V" + Math.floor(100 + Math.random() * 900);
+    }
+
+    const userProfile = {
+        fullname: formData.get("fullname"), email: formData.get("email"), phone: formData.get("phone"),
+        gender: formData.get("gender"), age: formData.get("age"), voterID: voterID,
+        password: formData.get("password"), type: currentFormType, address: formData.get("address")
+    };
+
+    try {
+        const response = await fetch("http://127.0.0.1:5001/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userProfile)
+        });
+        const result = await response.json();
+
+        if (response.ok && result.status === "success") {
+            modal.style.display = "none";
+            popup.style.display = "flex";
+            
+            const statusText = document.getElementById("statusText");
+            const progressFill = document.getElementById("progressFill");
+            const loaderWrapper = document.getElementById("loaderWrapper");
+
+            const stages = [
+                { text: "Securing Connection...", progress: "30%" },
+                { text: "Encrypting Data...", progress: "60%" },
+                { text: "Registration Secured!", progress: "100%" }
+            ];
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < stages.length) {
+                    statusText.innerText = stages[i].text;
+                    progressFill.style.width = stages[i].progress;
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    
+                   // 1. Remove Circular Spinner logic
+loaderWrapper.classList.remove("active-loader");
+
+// 2. Set Final Text
+statusText.innerText = "Registration Secured!";
+
+// 3. Load Blue Tick Animation
+lottie.loadAnimation({
+  container: document.getElementById("animationBox"),
+  path: "https://assets9.lottiefiles.com/packages/lf20_07as9vlv.json",
+  renderer: "svg", 
+  loop: false, 
+  autoplay: true
+});
+
+
+                    // 4. Redirect after 1 second
+                    setTimeout(() => {
+                        window.location.href = `/face-register?voter_id=${encodeURIComponent(userProfile.voterID)}`;
+                    }, 500);
+                }
+            }, 800);
+
+        } else { alert(result.message || "Registration failed!"); }
+    } catch (error) { alert("Server connection failed!"); }
+});
+
+function handleUpdateFace() {
+    let vID = document.getElementById('mainVoterID').value;
+    if (!vID || vID === 'V') {
+        const alt = document.querySelector('input[name="voterID"]');
+        if (alt) vID = alt.value;
+    }
+    if (!vID || vID === 'V') alert('Enter Voter ID first!');
+    else window.location.href = `/face-update?voter_id=${encodeURIComponent(vID)}`;
+}
+
+editBtn.onclick = () => modal.style.display = "none";
+window.onclick = (e) => { 
+    if(e.target == modal) modal.style.display = "none"; 
+};
+
+</script>
+</body>
+</html>

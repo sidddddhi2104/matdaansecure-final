@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>View Logs</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+body {
+  background: linear-gradient(to bottom, #ffffff, #f9fafb);
+  color: #111827;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow-x: hidden;
+}
+/* ===== COMMON APP BAR ===== */
+  .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;   /* ⬅ reduce from 24px */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 3000;
+  box-sizing: border-box; /* ⬅ VERY IMPORTANT */
+}
+    .header-left{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-left img{
+      width: 38px;
+      height: 38px;
+    }
+    .header-left span{
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+    .header-right button{
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .header-right button:hover{
+      background: #2563EB;
+    }
+/* ===== ASHOKA CHAKRA ===== */
+.chakra-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15cm;
+  height: 15cm;
+  opacity: 0.04;
+  z-index: 0;
+  animation: spin 25s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+/* ===== TITLE ===== */
+h1 {
+  color: #1E3A8A;
+  text-align: center;
+  margin-top: 70px;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+/* ===== SEARCH ===== */
+.search-container {
+  width: 85%;
+  margin: 20px auto 10px;
+  position: relative;
+  z-index: 10;
+}
+.search-container input {
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border: 1.5px solid rgba(14,165,233,0.4);
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.search-container input:focus {
+  outline: none;
+  border-color: #0EA5E9;
+  box-shadow: 0 0 8px rgba(14,165,233,0.4);
+}
+/* ===== LOGS CARD ===== */
+.logs-card {
+  width: 85%;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 40px;
+  z-index: 10;
+  animation: fadeIn 0.8s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  font-size: 16px;
+}
+th {
+  background: linear-gradient(90deg, #1E3A8A, #2563EB);
+  color: white;
+  padding: 12px;
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+  font-weight: 600;
+}
+td {
+  background: white;
+  padding: 12px;
+  text-align: center;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+tr:hover td {
+  background: #f0f9ff;
+  transform: scale(1.01);
+  box-shadow: 0 2px 6px rgba(14,165,233,0.15);
+}
+/* ===== ROW COLORS ===== */
+.voted-row {
+  background: #e0f2fe !important;
+  font-weight: 600;
+  color: #1E3A8A;
+  box-shadow: 0 0 8px rgba(14,165,233,0.2);
+}
+.warning-row {
+  background: #fff7e6 !important;
+  color: #92400e;
+  font-weight: 600;
+  box-shadow: 0 0 6px rgba(255,193,7,0.3);
+}
+.section-divider {
+  background: rgba(238, 238, 238, 0.7);
+  font-weight: bold;
+  text-align: center;
+  color: #111827;
+  border-radius: 6px;
+}
+</style>
+</head>
+<body>
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='admin-dashboard'">← Back to Home</button>
+  </div>
+</div>
+<!-- Chakra -->
+<div class="chakra-bg">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Ashoka_Chakra.svg/2048px-Ashoka_Chakra.svg.png" 
+       width="100%" height="100%">
+</div>
+<h1>🗂️ View Logs</h1>
+<div class="search-container">
+  <input type="text" id="searchInput" onkeyup="filterLogs()" placeholder="🔍 Search by Voter ID, Name, or Action...">
+</div>
+<div class="logs-card">
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Voter ID</th>
+        <th>Name</th>
+        <th>Action</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="logBody"></tbody>
+  </table>
+</div>
+<script>
+async function loadLogs() {
+  try {
+    const res = await fetch("http://127.0.0.1:5001/api/system-logs");
+    const data = await res.json();
+    renderLogs(data);
+  } catch (err) {
+    console.error("Failed to load logs", err);
+  }
+}
+function renderLogs(data) {
+  const logBody = document.getElementById("logBody");
+  logBody.innerHTML = "";
+  data.forEach(row => {
+    let rowClass = "";
+    if (row.activity && row.activity.toLowerCase().includes("vote")) {
+      rowClass = "voted-row";
+    }
+    if (row.activity && row.activity.toLowerCase().includes("failed")) {
+      rowClass = "warning-row";
+    }
+    logBody.innerHTML += `
+      <tr class="${rowClass}">
+        <td>${row.voterID ?? "-"}</td>
+        <td>${row.fullname ?? "-"}</td>
+        <td>${row.activity}</td>
+        <td>${new Date(row.log_time).toLocaleString()}</td>
+      </tr>
+    `;
+  });
+}
+loadLogs();
+</script>
+</body>
+</html>

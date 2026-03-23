@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Submit Suggestion | MATDAANSECURE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+      color: #111827;
+      padding: 100px 20px 40px;
+      min-height: 100vh;
+    }
+
+    /* ===== COMMON APP BAR ===== */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      z-index: 3000;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img { width: 38px; height: 38px; }
+
+    .header-left span {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+
+    .header-right button {
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .header-right button:hover { background: #2563EB; }
+
+    /* ===== ASHOKA CHAKRA ===== */
+    .chakra-bg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 15cm;
+      height: 15cm;
+      opacity: 0.04;
+      z-index: 0;
+      animation: spin 20s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    h1 {
+      text-align: center;
+      color: #1E3A8A;
+      margin-bottom: 30px;
+      font-weight: 800;
+      position: relative;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.05);
+      position: relative;
+      z-index: 10;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #0EA5E9;
+      font-size: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      background-color: #f9fafb;
+      transition: all 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #0EA5E9;
+      outline: none;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background: linear-gradient(to right, #1E3A8A, #2563EB);
+      color: white;
+      padding: 16px 30px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.3);
+    }
+
+    /* ===== CYBER-SUCCESS POPUP ===== */
+    .popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      justify-content: center;
+      align-items: center;
+      z-index: 4000;
+    }
+
+    .popup-content {
+      background: #fff;
+      padding: 40px;
+      border-radius: 30px;
+      text-align: center;
+      width: 90%;
+      max-width: 450px;
+      transform: translateY(50px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .popup.active .popup-content { transform: translateY(0); opacity: 1; }
+
+    .success-visual { width: 80px; height: 80px; margin: 0 auto 20px; }
+    .circle-bg { fill: none; stroke: #f0fdf4; stroke-width: 4; }
+    .circle-check {
+      fill: none; stroke: #22c55e; stroke-width: 4; stroke-linecap: round;
+      stroke-dasharray: 100; stroke-dashoffset: 100;
+      animation: drawCheck 0.8s forwards 0.3s;
+    }
+    @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+    .ref-box {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 25px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ref-box::after {
+      content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(14, 165, 233, 0.05), transparent);
+      transform: rotate(45deg); animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+
+    .ref-code {
+      display: block; font-family: 'Monaco', monospace; font-size: 1.4rem;
+      color: #1E3A8A; font-weight: 800; letter-spacing: 1px;
+    }
+
+    .copy-btn {
+      background: #111827; color: #fff; border: none; width: 100%;
+      padding: 14px; border-radius: 50px; cursor: pointer; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: 0.3s;
+    }
+    .copy-btn:hover { background: #1E3A8A; transform: scale(1.02); }
+
+    /* Toast notification */
+    .toast {
+      position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+      background: #111827; color: white; padding: 12px 25px; border-radius: 50px;
+      transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 5000; font-weight: 600; display: flex; align-items: center; gap: 8px;
+    }
+    .toast.show { bottom: 40px; }
+  </style>
+</head>
+
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg"
+     class="chakra-bg" alt="Ashoka Chakra">
+
+<h1>Submit A Suggestion</h1>
+
+<div class="container">
+  <h2>Suggestion Details</h2>
+
+  <form onsubmit="submitSuggestion(event)">
+    <label>Your Name</label>
+    <input type="text" id="name2" placeholder="Enter your full name" required>
+
+    <label>Voter ID Number</label>
+    <input type="text" name="voterID" id="mainVoterID" placeholder="V123" value="V" maxlength="4" required>
+
+    <label>Mobile Number</label>
+    <input type="tel" id="mobile2" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" required>
+
+    <label>Email Address</label>
+    <input type="email" id="email2" placeholder="example@email.com">
+
+    <label>State</label>
+    <select id="state1" onchange="updateDistricts()" required>
+      <option value="">-- Select State --</option>
+      <option value="Maharashtra">Maharashtra</option>
+      <option value="Gujarat">Gujarat</option>
+      <option value="Karnataka">Karnataka</option>
+    </select>
+
+    <label>District</label>
+    <select id="district1" required>
+      <option value="">-- Select District --</option>
+    </select>
+
+    <label>Your Suggestion</label>
+    <textarea id="suggestion-text" placeholder="Tell us how we can improve our services..." required></textarea>
+
+    <button type="submit" class="submit-btn">Submit Suggestion</button>
+  </form>
+</div>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <div class="success-visual">
+      <svg viewBox="0 0 52 52">
+        <circle class="circle-bg" cx="26" cy="26" r="25"/>
+        <path class="circle-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+    </div>
+    <h2 style="color:#111827; margin-bottom: 5px;">Submission Successful!</h2>
+    <p style="color:#64748B; font-size: 0.95rem;">Thank you for your valuable feedback.</p>
+
+    <div class="ref-box">
+      <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 2px;">Reference Code</span>
+      <span id="displayRefCode" class="ref-code">SUG-XXXXXX</span>
+    </div>
+
+    <button class="copy-btn" onclick="copyRefCode()">
+      <span>📋</span> Copy Reference Code
+    </button>
+    
+    <p onclick="location.reload()" style="margin-top:20px; cursor:pointer; font-size: 0.85rem; color: #0EA5E9; font-weight: 600;">Close & Return</p>
+  </div>
+</div>
+
+<div id="toast" class="toast"><span style="color:#22c55e">✔</span> Reference code copied!</div>
+
+<script>
+let generatedRefCode = "";
+
+const districtsByState = {
+  Maharashtra: ["Mumbai","Pune","Nagpur","Nashik"],
+  Gujarat: ["Ahmedabad","Surat","Vadodara","Rajkot"],
+  Karnataka: ["Bangalore","Mysore","Belagavi","Dharwad"]
+};
+
+function updateDistricts() {
+  const state = document.getElementById("state1").value;
+  const district = document.getElementById("district1");
+  district.innerHTML = '<option value="">-- Select District --</option>';
+
+  if (districtsByState[state]) {
+    districtsByState[state].forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      district.appendChild(opt);
+    });
+  }
+}
+
+function submitSuggestion(e) {
+  e.preventDefault();
+
+  const voterId = document.getElementById("mainVoterID").value;
+  const message = document.getElementById("suggestion-text").value;
+
+  if (!voterId || !message) {
+    alert("Voter ID and suggestion are required");
+    return;
+  }
+
+  fetch("http://127.0.0.1:5001/submit_suggestion", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      voter_id: voterId,
+      type: "GENERAL",              // ✅ matches DB column
+      message: message              // ✅ THIS WAS THE MAIN BUG
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      alert(data.message || "Submission failed ❌");
+      return;
+    }
+
+    generatedRefCode = data.reference_code;
+    document.getElementById("displayRefCode").innerText = generatedRefCode;
+
+    const popup = document.getElementById("popup");
+    popup.style.display = "flex";
+    setTimeout(() => popup.classList.add("active"), 50);
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Server error ❌");
+  });
+}
+function applyVoterIDLogic() {
+  const voterInputs = document.querySelectorAll("#mainVoterID, #voterID");
+
+  voterInputs.forEach(input => {
+    if (!input) return;
+    if (!input.value || !input.value.startsWith("V")) {
+      input.value = "V";
+    }
+
+    input.addEventListener("input", () => {
+      let value = input.value;
+      if (!value.startsWith("V")) { value = "V"; }
+      value = "V" + value.slice(1).replace(/\D/g, "").slice(0, 3);
+      input.value = value;
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if ((e.key === "Backspace" || e.key === "Delete") && input.selectionStart <= 1) {
+        e.preventDefault();
+      }
+    });
+  });
+}
+
+applyVoterIDLogic();
+
+function copyRefCode() {
+  if (!generatedRefCode) return;
+  navigator.clipboard.writeText(generatedRefCode).then(() => {
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  });
+}
+</script>
+</body>
+</html>

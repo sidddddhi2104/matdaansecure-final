@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anita Deshmukh - Progressive India</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: white;
+      color: #111827;
+      padding-top: 80px;
+      overflow-x: hidden; /* Prevents horizontal scroll from spinning image */
+    }
+
+    /* ===== ASHOKA CHAKRA BACKGROUND ===== */
+    .chakra-bg {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      opacity: 0.08; /* Slightly increased opacity to ensure visibility */
+      z-index: -1;
+      animation: spin 40s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spin { 
+      from { transform: translate(-50%, -50%) rotate(0deg); } 
+      to { transform: translate(-50%, -50%) rotate(360deg); } 
+    }
+
+    /* ===== COMMON APP BAR ===== */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      z-index: 3000;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img {
+      width: 38px;
+      height: 38px;
+    }
+
+    .header-left span {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+
+    .header-right button {
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .header-right button:hover {
+      background: #2563EB;
+    }
+
+    /* ===== CANDIDATE CARD (TRANSPARENT) ===== */
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      /* Changed background to semi-transparent white */
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: blur(4px); /* Adds a modern frosted glass effect */
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    h2 {
+      color: #1E3A8A;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .candidate-img {
+      display: block;
+      margin: 20px auto;
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #0EA5E9;
+      background: white; /* Ensures image background stays clean */
+    }
+
+    ul {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .back-btn {
+      display: block;
+      width: max-content;
+      margin: 30px auto 0;
+      background: #1E3A8A;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: #2563EB;
+    }
+  </style>
+</head>
+
+<body>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" alt="Ashoka Chakra" class="chakra-bg">
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='/home'">← Back to Home</button>
+  </div>
+</div>
+
+<div class="container">
+  <h2>Anita Deshmukh</h2>
+
+  <img 
+    src="{{ url_for('static', filename='images/Anita_Deshmukh.jpeg') }}" 
+    class="candidate-img" 
+    alt="Anita Deshmukh">
+
+  <p><strong>Age:</strong> 46</p>
+  <p><strong>Symbol:</strong> 🪷 Lotus</p>
+  <p><strong>Education:</strong> M.A. in Political Science</p>
+  <p><strong>Experience:</strong> 15 years in public administration</p>
+  <p><strong>Party:</strong> Progressive India</p>
+  <p><strong>Vision:</strong> Inclusive development</p>
+
+  <p><strong>Top Priorities:</strong></p>
+  <ul>
+    <li>Education reform</li>
+    <li>Healthcare accessibility</li>
+    <li>Women empowerment</li>
+    <li>Social welfare programs</li>
+  </ul>
+  <a href="/candidates" class="back-btn">← Back to Candidates</a>
+</div>
+</body>
+</html>

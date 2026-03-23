@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Start</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+        background: url("{{ url_for('static', filename='images/start.jpg') }}")
+                no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+        color: white;
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .top-section {
+        margin-top: 50px; /* push text down from very top */
+        text-align: center;
+    }
+.below-section {
+  margin-top: 550px; /* push text down from very top */
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    p {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    .enter-btn {
+        margin-top: 20px;
+        padding: 12px 30px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        border: 2px solid white;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    .enter-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: scale(1.05);
+    }
+    .footer {
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+        opacity: 0.9;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+<body>
+
+<div class="top-section">
+    <h1>MATDAANSECURE</h1>
+    <p>Empowering Democracy through Secure Digital Voting</p>
+   </div>
+<div class="below-section">
+<button class="enter-btn" onclick="window.location.href='register'">Enter Site</button>
+</div>
+<div class="footer">Developed by Siddhi Kamble - D.G.Ruparel College</div>
+
+</body>
+</html>

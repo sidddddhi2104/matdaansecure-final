@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Logs - MATDAANSECURE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    body {
+      background: #ffffff; /* Solid white background for Chakra visibility */
+      color: #111827;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      padding-top: 80px;
+    }
+
+    /* ===== ASHOKA CHAKRA BACKGROUND ===== */
+    .chakra-bg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      opacity: 0.05;
+      z-index: -1;
+      animation: spin 40s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ===== APP HEADER ===== */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      z-index: 3000;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img {
+      width: 38px;
+      height: 38px;
+    }
+
+    .header-left span {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+
+    .header-right button {
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .header-right button:hover {
+      background: #2563EB;
+    }
+
+    /* ===== CONTENT STYLING ===== */
+    h1 {
+      color: #1E3A8A;
+      text-align: center;
+      margin: 20px 0;
+      font-size: 2rem;
+      z-index: 10;
+    }
+
+    .search-container {
+      width: 90%;
+      max-width: 1000px;
+      margin-bottom: 20px;
+      z-index: 10;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 14px 20px;
+      border: 1px solid rgba(30, 58, 138, 0.2);
+      border-radius: 12px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .search-container input:focus {
+      outline: none;
+      border-color: #0EA5E9;
+      box-shadow: 0 0 10px rgba(14, 165, 233, 0.2);
+    }
+
+    /* ===== LOGS TABLE CARD ===== */
+    .logs-card {
+      width: 90%;
+      max-width: 1000px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 40px;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    th {
+      background: #1E3A8A;
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    th:first-child { border-radius: 10px 0 0 10px; }
+    th:last-child { border-radius: 0 10px 10px 0; }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    tr:hover td {
+      background: rgba(14, 165, 233, 0.05);
+    }
+
+    /* Status Rows */
+    .voted-row td {
+      background: rgba(22, 163, 74, 0.08) !important;
+      color: #166534;
+      font-weight: 600;
+    }
+
+    .warning-row td {
+      background: rgba(220, 38, 38, 0.08) !important;
+      color: #991b1b;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      table { font-size: 12px; }
+      th, td { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" alt="Ashoka Chakra" class="chakra-bg">
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='admin-dashboard'">← Back to Dashboard</button>
+  </div>
+</div>
+
+<h1>🗂️ System Activity Logs</h1>
+
+<div class="search-container">
+  <input type="text" id="searchInput" onkeyup="filterLogs()" placeholder="Search by Voter ID, Name, or Action (e.g., 'voted', 'failed')...">
+</div>
+
+<div class="logs-card">
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Voter ID</th>
+        <th>Name</th>
+        <th>Action</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="logBody">
+      </tbody>
+  </table>
+</div>
+
+<script>
+async function loadLogs() {
+  const logBody = document.getElementById("logBody");
+  logBody.innerHTML = "<tr><td colspan='4'>Loading logs...</td></tr>";
+
+  try {
+    const res = await fetch("http://127.0.0.1:5001/api/system-logs");
+    const data = await res.json();
+    renderLogs(data);
+  } catch (err) {
+    logBody.innerHTML = "<tr><td colspan='4' style='color:red;'>Failed to connect to the log server.</td></tr>";
+    console.error("Failed to load logs", err);
+  }
+}
+
+function renderLogs(data) {
+  const logBody = document.getElementById("logBody");
+  logBody.innerHTML = "";
+
+  data.forEach(row => {
+    let rowClass = "";
+    const activity = (row.activity || "").toLowerCase();
+    
+    if (activity.includes("vote")) rowClass = "voted-row";
+    if (activity.includes("failed") || activity.includes("reject")) rowClass = "warning-row";
+
+    const tr = document.createElement("tr");
+    tr.className = rowClass;
+    tr.innerHTML = `
+      <td>${row.voterID ?? "-"}</td>
+      <td>${row.fullname ?? "-"}</td>
+      <td>${row.activity}</td>
+      <td>${row.log_time}</td>
+    `;
+    logBody.appendChild(tr);
+  });
+}
+
+function filterLogs() {
+  const input = document.getElementById("searchInput");
+  const filter = input.value.toLowerCase();
+  const table = document.getElementById("logTable");
+  const tr = table.getElementsByTagName("tr");
+
+  for (let i = 1; i < tr.length; i++) {
+    const rowText = tr[i].textContent.toLowerCase();
+    tr[i].style.display = rowText.includes(filter) ? "" : "none";
+  }
+}
+
+// Initial Load
+loadLogs();
+// Refresh logs every 30 seconds
+setInterval(loadLogs, 30000);
+</script>
+
+</body>
+</html>

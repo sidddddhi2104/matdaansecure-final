@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Voter Profile | MATDAANSECURE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== GLOBAL STYLES ===== */
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+    background: #f3f4f6;
+    padding: 100px 30px 30px 30px; 
+    margin: 0;
+}
+
+@media print {
+    body { background: white; padding: 0; }
+    .no-print, .app-header, .actions { display: none !important; }
+    /* Ensures colors and watermark background-images show in PDF */
+    .card { 
+        border: 2px solid #1E3A8A !important; 
+        box-shadow: none !important; 
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact;
+    }
+}
+
+/* ===== APP BAR ===== */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;   
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 3000;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-left img { width: 38px; height: 38px; }
+.header-left span { font-size: 22px; font-weight: 700; color: #1E3A8A; }
+.header-right button { 
+    background: #1E3A8A; 
+    color: #ffffff; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 8px; 
+    font-size: 14px; 
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* ===== CARD & REPEATING WATERMARK ===== */
+.card {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    border: 3px solid #1E3A8A;
+    border-radius: 14px;
+    padding: 25px 30px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* Darker, Continuous Watermark */
+.card::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* Darker opacity (0.12 instead of 0.05) and Bold weight */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100' viewBox='0 0 200 100'%3E%3Ctext x='50%25' y='50%25' font-size='18' font-weight='900' fill='rgba(30, 58, 138, 0.18)' family='Segoe UI, Tahoma, sans-serif' text-anchor='middle' transform='rotate(-20, 100, 50)'%3EMATDAANSECURE%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+    pointer-events: none;
+    z-index: 1; /* Sits behind text (z-index 2) but above background */
+}
+
+/* ===== MULTI-PASS SCANNING ANIMATION ===== */
+.scan-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 58, 138, 0.03);
+    display: none;
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* Subtle Blue Tint during the scan */
+.scanning .scan-overlay {
+    display: block;
+    animation: pulseBg 0.6s infinite alternate;
+}
+
+.scan-line {
+    display: none;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #3b82f6;
+    /* Professional glow: primary blue + outer soft glow */
+    box-shadow: 
+        0 0 10px #3b82f6, 
+        0 0 20px #1E3A8A,
+        0 0 30px rgba(59, 130, 246, 0.6);
+    z-index: 101;
+}
+
+.scanning .scan-line {
+    display: block;
+    /* 1.2s per pass x 3 passes = 3.6s total */
+    animation: tripleScan 1.2s ease-in-out 3 alternate forwards;
+}
+
+/* The 3-pass movement logic */
+@keyframes tripleScan {
+    0% { top: 0%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 1; }
+}
+
+@keyframes pulseBg {
+    from { background: rgba(30, 58, 138, 0.02); }
+    to { background: rgba(30, 58, 138, 0.08); }
+}
+
+/* Ensures content doesn't flicker during capture */
+.is-capturing .scan-overlay, 
+.is-capturing .scan-line {
+    display: none !important;
+
+/* Spinner Animation */
+.spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success State for Button */
+.btn-download.is-loading {
+    background: #1e40af; /* Deeper blue during scan */
+    transition: all 0.4s ease;
+}
+
+.btn-download.is-success {
+    background: #059669 !important; /* Success Green */
+    transform: scale(1.05);
+}
+}/* ===== CARD CONTENT (High Z-Index for readability) ===== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #1E3A8A;
+    padding-bottom: 12px;
+    position: relative;
+    z-index: 2;
+}
+
+.header h1 { color: #1E3A8A; font-size: 28px; margin: 0; }
+.header img { height: 42px; }
+
+.content {
+    display: flex;
+    gap: 30px;
+    margin-top: 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.photo {
+    width: 150px;
+    height: 180px;
+    border: 3px solid #1E3A8A;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* This keeps the image inside the rounded corners */
+    background: #f9fafb;
+    flex-shrink: 0;
+}
+.details { flex: 1; }
+.details p { font-size: 17px; margin: 10px 0; color: #000; font-weight: 500; }
+.details span {
+    font-weight: 800;
+    color: #1E3A8A;
+    width: 120px;
+    display: inline-block;
+}
+
+.divider {
+    border-top: 2px dashed #1E3A8A;
+    margin: 30px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 2;
+}
+
+.qr-box {
+    width: 140px;
+    height: 140px;
+    border: 2px solid #1E3A8A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.sign { text-align: right; max-width: 220px; }
+.sign img { width: 160px; max-width: 100%; display: block; margin-left: auto; filter: contrast(1.2); }
+.sign p { margin-top: 6px; font-weight: 700; color: #1E3A8A; }
+
+/* ===== THEMED DOWNLOAD BUTTON ===== */
+.actions { text-align: center; margin-top: 30px; }
+.btn-download {
+    background: #1E3A8A; 
+    color: #fff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
+    transition: all 0.3s ease;
+}
+.btn-download:hover { 
+    background: #162d6b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(30, 58, 138, 0.4);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='/home'">← Back to Home</button>
+  </div>
+</div>
+
+<div class="card" id="voterCard">
+  <div class="scan-overlay"></div> <div class="scan-line"></div>
+  <div class="header">
+    <h1>MATDAANSECURE</h1>
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+  </div>
+
+  <div class="content">
+  <div class="photo">
+{% if user.get('face_image') %}
+<img src="/{{ user['face_image'] }}"
+     alt="Voter Face"
+     style="width:100%;height:100%;object-fit:cover;">
+{% else %}
+<p>NO PHOTO AVAILABLE</p>
+{% endif %}
+</div>
+
+
+    <div class="details">
+      <p><span>Name:</span> {{ user.get('name','N/A') }}</p>
+      <p><span>Voter ID:</span> {{ user.get('voterID','N/A') }}</p>
+      <p><span>Email:</span> {{ user.get('email','N/A') }}</p>
+      <p><span>Phone:</span> {{ user.get('phone','N/A') }}</p>
+      <p><span>Gender:</span> {{ user.get('gender','N/A') }}</p>
+      <p><span>Age:</span> {{ user.get('age','N/A') }}</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="footer">
+    <div class="qr-box">
+      <img src="{{ url_for('static', filename=user['qr_path']) }}" width="125" alt="QR Code">
+    </div>
+
+    <div class="sign">
+      <img src="{{ url_for('static', filename='images/signature.png') }}" alt="Signature">
+      <p>Chief Election Officer</p>
+    </div>
+  </div>
+</div>
+
+<div class="actions no-print">
+  <button class="btn-download" onclick="startScanAndPrint()">⬇ Download Secure PDF</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+async function startScanAndPrint() {
+    const { jsPDF } = window.jspdf;
+    const card = document.getElementById('voterCard');
+    const btn = document.querySelector('.btn-download');
+    
+    const voterIDFull = "{{ user.get('voterID','UNKNOWN') }}";
+    const fileName = `Voter_ProofID_${voterIDFull}.pdf`;
+
+    // 1. START SCANNING PHASE
+    card.classList.add('scanning');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    // Injecting the spinner + text
+    btn.innerHTML = `<div class="spinner"></div> VERIFYING BIOMETRICS...`;
+
+    // Wait for the 3-pass scan (3.6 seconds)
+    await new Promise(resolve => setTimeout(resolve, 3650));
+
+    // 2. SUCCESS / GENERATING PHASE
+    card.classList.remove('scanning'); // Stop laser
+    card.classList.add('is-capturing'); // Prepare for screenshot
+    
+    btn.classList.remove('is-loading');
+    btn.classList.add('is-success');
+    // Change icon to a checkmark or similar
+    btn.innerHTML = `✓ SUCCESS: GENERATING PDF`;
+
+    // Small delay so user can actually SEE the "Success" state
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    html2canvas(card, {
+        scale: 3, 
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4'); 
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(fileName);
+
+        // 3. RESET TO ORIGINAL
+        setTimeout(() => {
+            card.classList.remove('is-capturing');
+            btn.disabled = false;
+            btn.classList.remove('is-success');
+            btn.innerHTML = `⬇ Download Secure PDF`;
+        }, 1000);
+    });
+}
+</script>
+</body>
+</html>

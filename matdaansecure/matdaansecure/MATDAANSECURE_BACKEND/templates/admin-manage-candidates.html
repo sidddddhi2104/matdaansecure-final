@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Candidates | Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+input[readonly] {
+  background-color: #f3f4f6; /* Light gray */
+  color: #6b7280; /* Dimmed text */
+  cursor: not-allowed;
+}
+/* ===== BODY ===== */
+body {
+  background: linear-gradient(to bottom, #ffffff, #f9fafb);
+  color: #111827;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* ===== ASHOKA CHAKRA WATERMARK ===== */
+.chakra-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15cm;
+  height: 15cm;
+  opacity: 0.04;
+  z-index: 0;
+  animation: spin 25s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===== COMMON APP BAR ===== */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 3000;
+  box-sizing: border-box;
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-left img { width: 38px; height: 38px; }
+.header-left span { font-size: 22px; font-weight: 700; color: #1E3A8A; }
+.header-right button {
+  background: #1E3A8A; color: #ffffff; border: none; padding: 8px 16px;
+  border-radius: 8px; font-size: 14px; cursor: pointer;
+}
+.header-right button:hover { background: #2563EB; }
+
+/* ===== TITLE ===== */
+h1 {
+  color: #1E3A8A; text-align: center; margin-top: 90px;
+  font-size: 2rem; letter-spacing: 1px; position: relative; z-index: 1;
+}
+
+/* ===== ACTION BAR ===== */
+.action-bar { margin: 20px; display: flex; gap: 10px; justify-content: center; }
+.action-bar button {
+  background-color: #1E3A8A; color: #fff; font-weight: 600; padding: 10px 20px;
+  border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s ease;
+}
+.action-bar button:hover { background-color: #2563EB; transform: translateY(-2px); }
+
+/* ===== TABLE ===== */
+table {
+  width: 95%; border-collapse: collapse; background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  margin-bottom: 40px; position: relative; z-index: 1; backdrop-filter: blur(6px);
+}
+table th, table td { padding: 14px; text-align: center; border-bottom: 1px solid #e5e7eb; }
+table th { background: #1E3A8A; color: white; }
+table img { border-radius: 50%; object-fit: cover; border: 2px solid #0EA5E9; }
+
+/* ===== ACTION BUTTONS IN TABLE ===== */
+.action-btn { padding: 6px 14px; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; color: #fff; margin: 0 4px; }
+.edit-btn { background-color: #0EA5E9; }
+.delete-btn { background-color: #dc3545; }
+
+/* ===== TOP CENTER FLOATING TOASTS ===== */
+#toast-container { 
+  position: fixed; 
+  top: 20px; 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999; /* Higher than header */
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  background: #1E3A8A; color: white; padding: 12px 24px; border-radius: 50px;
+  margin-bottom: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: flex; align-items: center; gap: 12px;
+  min-width: 280px;
+  justify-content: center;
+  font-weight: 500;
+  animation: slideInTop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+             fadeOut 0.4s ease-in 2.6s forwards;
+}
+@keyframes slideInTop { 
+  from { transform: translateY(-100px); opacity: 0; } 
+  to { transform: translateY(0); opacity: 1; } 
+}
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-20px); } }
+
+/* ===== MODALS ===== */
+.modal, .confirm-modal {
+  display: none; position: fixed; z-index: 4000; left: 0; top: 0;
+  width: 100%; height: 100%; background: rgba(17,24,39,0.6);
+  backdrop-filter: blur(5px); justify-content: center; align-items: center;
+}
+.modal-content, .confirm-content {
+  background: #ffffff; padding: 25px 30px; border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2); position: relative;
+  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-content { width: 95%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+.confirm-content { width: 320px; text-align: center; }
+
+@keyframes modalPop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ===== ROW ANIMATIONS ===== */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.row-animate { animation: fadeInUp 0.5s ease forwards; }
+.row-fade-out { opacity: 0; transform: scale(0.95); filter: blur(4px); transition: all 0.4s ease; }
+@keyframes highlightUpdate { 0% { background-color: rgba(14, 165, 233, 0.3); } 100% { background-color: transparent; } }
+.row-updated { animation: highlightUpdate 1.5s ease; }
+
+/* FORM STYLING */
+.modal-content label { display: block; margin-top: 12px; font-weight: 600; font-size: 14px; color: #4b5563; }
+.modal-content input, .modal-content select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.modal-actions, .confirm-btns { margin-top: 25px; display: flex; justify-content: flex-end; gap: 12px; }
+.submit-btn { background: #1E3A8A; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+.cancel-btn { background: #94a3b8; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="chakra-bg">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" width="100%" height="100%">
+</div>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='admin-dashboard'">← Back to Home</button>
+  </div>
+</div>
+
+<h1>🗳️ Manage Candidates</h1>
+
+<div class="action-bar">
+  <button onclick="openModal()">➕ Add Candidate</button>
+</div>
+
+<table id="candidateTable">
+  <thead>
+    <tr>
+      <th>ID</th><th>Name</th><th>Party</th><th>Photo</th><th>Symbol</th><th>Status</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div class="modal" id="addModal">
+  <div class="modal-content">
+    <h2 id="modalTitle">Add New Candidate</h2>
+    <form id="addCandidateForm">
+      <input type="hidden" id="candidateId">
+      <label>Candidate ID</label><input type="text" id="candidateCode" readonly>
+      <label>Name</label><input type="text" id="candidateName" required>
+      <label>Age</label><input type="number" id="candidateAge">
+      <label>Education</label><input type="text" id="candidateEducation">
+      <label>Experience</label><input type="text" id="candidateExperience">
+      <label>Party</label><input type="text" id="candidateParty" required>
+      <label>Photo URL</label><input type="text" id="candidatePhoto" required>
+      <label>Symbol (Emoji)</label><input type="text" id="candidateSymbol" required>
+      <label>Status</label>
+      <select id="candidateStatus">
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="submit-btn">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="confirmModal" class="confirm-modal">
+  <div class="confirm-content">
+    <h3 style="color: #1E3A8A;">Confirm Action</h3>
+    <p style="margin-top: 10px; color: #64748b; font-size: 14px;">Are you sure you want to delete this candidate?</p>
+    <div class="confirm-btns" style="justify-content: center;">
+      <button class="cancel-btn" onclick="closeConfirm()">Cancel</button>
+      <button class="delete-btn" id="confirmDeleteBtn" style="padding: 10px 20px; border-radius: 8px; border:none; cursor:pointer;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const apiBase = "http://127.0.0.1:5001";
+let candidateData = [];
+let lastUpdatedId = null;
+let deleteIdTarget = null;
+
+// TOAST NOTIFICATIONS (Top Center)
+function showToast(msg, type = "success") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  if(type === "error") toast.style.background = "#dc3545";
+  toast.innerHTML = `<span>${type === 'success' ? '✅' : '⚠️'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+async function loadCandidatesFromServer() {
+  try {
+    const res = await fetch(apiBase + "/get-candidates");
+    const data = await res.json();
+    candidateData = data.candidates;
+    renderTable();
+  } catch (e) { showToast("Server connection failed", "error"); }
+}
+window.onload = loadCandidatesFromServer;
+
+function renderTable() {
+  const tbody = document.querySelector("#candidateTable tbody");
+  tbody.innerHTML = "";
+  candidateData.forEach((c, index) => {
+    const isNewest = (lastUpdatedId === c.id);
+    const row = document.createElement('tr');
+    row.className = isNewest ? 'row-updated' : 'row-animate';
+    row.style.animationDelay = `${index * 0.05}s`;
+    row.id = `row-${c.id}`;
+    row.innerHTML = `
+        <td>C${String(c.id).padStart(3,"0")}</td>
+        <td>${c.name}</td>
+        <td>${c.party}</td>
+        <td><img src="${apiBase}${c.photo}" width="60" height="60" onerror="this.src='https://via.placeholder.com/60'"></td>
+        <td>${c.symbol}</td>
+        <td>${c.status}</td>
+        <td>
+          <button class="action-btn edit-btn" onclick="openModalById(${c.id})">Edit</button>
+          <button class="action-btn delete-btn" onclick="deleteCandidate(${c.id})">Delete</button>
+        </td>`;
+    tbody.appendChild(row);
+  });
+  lastUpdatedId = null;
+}
+
+function openModalById(id) {
+  const c = candidateData.find(x => x.id === id);
+  if (!c) return showToast("Candidate not found", "error");
+
+  document.getElementById("candidateId").value = c.id;
+  // Shows the actual ID of the candidate being edited (e.g., C011)
+  document.getElementById("candidateCode").value = "C" + String(c.id).padStart(3, "0");
+
+  document.getElementById("candidateName").value = c.name;
+  document.getElementById("candidateAge").value = c.age || "";
+  document.getElementById("candidateEducation").value = c.education || "";
+  document.getElementById("candidateExperience").value = c.experience || "";
+  document.getElementById("candidateParty").value = c.party;
+  document.getElementById("candidatePhoto").value = c.photo;
+  document.getElementById("candidateSymbol").value = c.symbol;
+  document.getElementById("candidateStatus").value = c.status;
+
+  document.getElementById("modalTitle").innerText = "Edit Candidate";
+  document.getElementById("addModal").style.display = "flex";
+}
+function openModal() {
+  document.getElementById("addCandidateForm").reset();
+  
+  // 1. Calculate the next ID based on the largest ID currently in the table
+  let nextId = 1;
+  if (candidateData.length > 0) {
+    // Math.max finds the highest numeric ID in your current list
+    const maxId = Math.max(...candidateData.map(c => parseInt(c.id)));
+    nextId = maxId + 1;
+  }
+
+  // 2. Set the hidden ID field (used by the backend)
+  document.getElementById("candidateId").value = ""; 
+  
+  // 3. Set the read-only display field (C012, etc.)
+  const formattedId = "C" + String(nextId).padStart(3, "0");
+  document.getElementById("candidateCode").value = formattedId;
+
+  document.getElementById("modalTitle").innerText = "Add New Candidate";
+  document.getElementById("addModal").style.display = "flex";
+}
+function closeModal() { document.getElementById("addModal").style.display = "none"; }
+function closeConfirm() { document.getElementById("confirmModal").style.display = "none"; }
+
+document.getElementById("addCandidateForm").onsubmit = async e => {
+  e.preventDefault();
+  const id = document.getElementById("candidateId").value;
+  const payload = {
+    name: document.getElementById("candidateName").value,
+    age: document.getElementById("candidateAge").value,
+    education: document.getElementById("candidateEducation").value,
+    experience: document.getElementById("candidateExperience").value,
+    party: document.getElementById("candidateParty").value,
+    photo: document.getElementById("candidatePhoto").value,
+    symbol: document.getElementById("candidateSymbol").value,
+    status: document.getElementById("candidateStatus").value
+  };
+
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${apiBase}/update-candidate/${id}` : `${apiBase}/add-candidate`;
+
+  try {
+    await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (id) lastUpdatedId = parseInt(id);
+    showToast(id ? "Updated successfully!" : "Added successfully!");
+    closeModal();
+    loadCandidatesFromServer();
+  } catch(e) { showToast("Save failed", "error"); }
+};
+
+function deleteCandidate(id) {
+  deleteIdTarget = id;
+  document.getElementById("confirmModal").style.display = "flex";
+}
+
+document.getElementById("confirmDeleteBtn").onclick = async () => {
+  const id = deleteIdTarget;
+  closeConfirm();
+  const row = document.getElementById(`row-${id}`);
+  if (row) {
+    row.classList.add('row-fade-out');
+    setTimeout(async () => {
+      try {
+        await fetch(`${apiBase}/delete-candidate/${id}`, { method: "DELETE" });
+        showToast("Deleted successfully");
+        loadCandidatesFromServer();
+      } catch(e) { showToast("Delete failed", "error"); }
+    }, 400);
+  }
+};
+</script>
+</body>
+</html>

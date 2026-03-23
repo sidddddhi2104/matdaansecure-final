@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Face Registration | MATDAANSECURE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 80px;
+        }
+
+        /* HEADER */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px; /* Increased slightly for breathing room */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 3000;
+    box-sizing: border-box; /* Crucial to keep button inside screen */
+}
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.header-left img{
+  width:38px;
+  height:38px;
+}
+.header-left span{
+  font-size:22px;
+  font-weight:700;
+  color:#1E3A8A;
+}
+.header-right button{
+  background:#1E3A8A;
+  color:#fff;
+  border:none;
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+        /* CARD */
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            padding: 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        h2 { color: #1e3a8a; margin-bottom: 6px; font-size: 24px; }
+        .subtitle { color: #64748b; font-size: 14px; margin-bottom: 20px; min-height: 20px; }
+
+        /* CAMERA BOX & ANIMATIONS */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 20px;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 1px #e2e8f0;
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Scanning Overlay */
+        .scan-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .scanning-active .scan-overlay { opacity: 1; }
+
+        .laser {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #2563eb, transparent);
+            box-shadow: 0 0 15px #2563eb;
+            top: 0;
+            display: none;
+            animation: moveLaser 2s linear infinite;
+        }
+        @keyframes moveLaser { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+
+        .face-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .liveness-ready .face-guide { border-color: #22c55e; border-width: 3px; box-shadow: 0 0 15px rgba(34,197,94,0.4); }
+
+        /* STATUS BOX */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        /* BUTTON */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-action:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-action:active { transform: translateY(0); }
+        .btn-action:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='/home'">←Back to Home</button>
+  </div>
+</div>
+<div class="card">
+    <h2>Update Face</h2>
+    <p class="subtitle" id="instruction">Initializing secure environment...</p>
+
+    <div class="camera-container" id="cameraBox">
+        <div class="scan-overlay">
+            <div class="laser" id="laserLine"></div>
+            <svg width="100" height="100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="5"/>
+                <circle id="progressCircle" cx="50" cy="50" r="45" fill="none" stroke="#2563eb" stroke-width="5" 
+                        stroke-dasharray="283" stroke-dashoffset="283" style="transition: stroke-dashoffset 2s linear;"/>
+            </svg>
+        </div>
+        <div class="face-guide" id="guide"></div>
+        <video id="video" autoplay muted playsinline></video>
+    </div>
+
+    <div class="status-pill" id="statusContainer">
+        <i class="fa-solid fa-circle-notch fa-spin" id="statusIcon"></i>
+        <span id="statusText">Loading models...</span>
+    </div>
+
+    <button id="registerBtn" class="btn-action" onclick="captureFace()" disabled>
+        <span class="spinner" id="btnSpinner"></span>
+        <span id="btnText">Update Biometrics</span>
+    </button>
+
+    <p style="font-size:11px; color:#94a3b8; margin-top:15px; text-transform: uppercase; letter-spacing: 1px;">
+        <i class="fa-solid fa-shield-halved"></i> Military Grade Encryption
+    </p>
+
+    <canvas id="canvas" hidden></canvas>
+</div>
+
+<script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<script>
+let video, statusText, registerBtn, instruction, cameraBox, laserLine, progressCircle;
+let registrationInProgress = false;
+
+const params = new URLSearchParams(window.location.search);
+const voter_id = params.get("voter_id") || "DEMO_USER";
+
+window.onload = async () => {
+    video = document.getElementById("video");
+    statusText = document.getElementById("statusText");
+    statusIcon = document.getElementById("statusIcon");
+    registerBtn = document.getElementById("registerBtn");
+    instruction = document.getElementById("instruction");
+    cameraBox = document.getElementById("cameraBox");
+    laserLine = document.getElementById("laserLine");
+    progressCircle = document.getElementById("progressCircle");
+
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri("/static/models");
+        await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/static/models");
+
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        video.srcObject = stream;
+        
+        instruction.innerText = "Step 1: Please turn your head side-to-side slowly";
+        statusText.innerText = "Waiting for liveness...";
+        startDetection();
+    } catch (err) {
+        statusText.innerText = "Hardware Error: Camera blocked";
+        statusIcon.className = "fa-solid fa-circle-xmark";
+        statusIcon.style.color = "#ef4444";
+    }
+};
+
+function startDetection() {
+    video.addEventListener("play", () => {
+        let initialX = null;
+        let movementCount = 0;
+
+        const interval = setInterval(async () => {
+            const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
+
+            if (detection) {
+                const nose = detection.landmarks.positions[30];
+                if (initialX === null) { initialX = nose.x; return; }
+                
+                if (Math.abs(nose.x - initialX) > 20) {
+                    movementCount++;
+                    initialX = nose.x;
+                }
+
+                if (movementCount >= 3) {
+                    clearInterval(interval);
+                    triggerLivenessSuccess();
+                }
+            }
+        }, 200);
+    });
+}
+
+function triggerLivenessSuccess() {
+    cameraBox.classList.add("liveness-ready");
+    statusText.innerText = "Identity Verified";
+    statusIcon.className = "fa-solid fa-circle-check";
+    statusIcon.style.color = "#10b981";
+    instruction.innerText = "Ready to update your biometric record";
+    registerBtn.disabled = false;
+}
+
+function captureFace() {
+    if (registrationInProgress) return;
+    registrationInProgress = true;
+
+    // Start UI Animation
+    registerBtn.disabled = true;
+    document.getElementById("btnSpinner").style.display = "block";
+    document.getElementById("btnText").innerText = "Processing...";
+    cameraBox.classList.add("scanning-active");
+    laserLine.style.display = "block";
+    progressCircle.style.strokeDashoffset = "0";
+
+    const canvas = document.getElementById("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    const imageBase64 = canvas.toDataURL("image/jpeg");
+
+    // Artificial delay to let the animation play out for "professional" feel
+    setTimeout(() => {
+        fetch("/face-update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ voter_id, image: imageBase64 })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                handleFinalSuccess();
+            } else {
+                resetUI(data.message);
+            }
+        })
+        .catch(() => resetUI("Connection Lost"));
+    }, 2000); 
+}
+
+function handleFinalSuccess() {
+    statusText.innerText = "Cloud Record Updated";
+    instruction.innerText = "Secure update complete. Redirecting...";
+    laserLine.style.display = "none";
+    setTimeout(() => { window.location.href = "/login"; }, 2000);
+}
+
+function resetUI(msg) {
+    registrationInProgress = false;
+    registerBtn.disabled = false;
+    document.getElementById("btnSpinner").style.display = "none";
+    document.getElementById("btnText").innerText = "Retry Update";
+    cameraBox.classList.remove("scanning-active");
+    laserLine.style.display = "none";
+    progressCircle.style.strokeDashoffset = "283";
+    statusText.innerText = msg;
+    statusIcon.className = "fa-solid fa-triangle-exclamation";
+}
+</script>
+</body>
+</html>

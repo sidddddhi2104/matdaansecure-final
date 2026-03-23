@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Election Settings | EVIC Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===================== GLOBAL & REFINED PALETTE ===================== */
+:root {
+    --primary: #1e3a8a;
+    --primary-hover: #2563eb;
+    --accent: #0ea5e9;
+    --bg-light: #f8fafc;
+    --text-main: #1e293b;
+    --border-color: #e2e8f0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Change body background to white */
+body {
+    background: #ffffff; 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-main);
+    overflow-x: hidden;
+    padding-top: 80px;
+}
+
+/* Floating Toast Styles */
+/* Refined Blue Toast Styles */
+#toast {
+    visibility: hidden;
+    min-width: 300px;
+    background-color: var(--primary); /* Deep Blue */
+    color: #ffffff;
+    text-align: center;
+    border-radius: 16px;
+    padding: 16px 24px;
+    position: fixed;
+    z-index: 5000;
+    top: 25px; 
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    transform: translateY(-20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#toast.show {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Color accents for different states */
+#toast.success { 
+    background: linear-gradient(135deg, var(--primary), #1e40af);
+    border-bottom: 4px solid #10b981; /* Green success strip */
+}
+
+#toast.error { 
+    background: linear-gradient(135deg, #7f1d1d, #b91c1c); /* Dark red for errors */
+    border-bottom: 4px solid #f87171;
+}
+/* ===== APP HEADER (Logic Unchanged) ===== */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 3000;
+    box-sizing: border-box;
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-left img { width: 38px; height: 38px; }
+.header-left span { font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+
+.header-right button {
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.header-right button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+/* ===================== BACKGROUND ELEMENTS ===================== */
+.chakra-bg {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    opacity: 0.03;
+    z-index: 0;
+    animation: spin 60s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===================== FORM CARD & TYPOGRAPHY ===================== */
+h1 {
+    color: var(--primary);
+    margin: 40px 0 25px;
+    font-size: 2.2rem;
+    font-weight: 800;
+}
+
+form {
+    max-width: 550px;
+    width: 90%;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    z-index: 1;
+    position: relative;
+}
+
+/* ===================== ENHANCED INPUTS ===================== */
+.form-section {
+    margin-bottom: 24px;
+}
+
+.label-strip {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+}
+
+input, select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-color);
+    font-size: 15px;
+    background: #fcfdfe;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-main);
+}
+
+input:focus, select:focus {
+    border-color: var(--accent);
+    background: #fff;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+}
+
+/* ===================== STATUS INDICATOR COLORING ===================== */
+/* Subtle visual cue based on status */
+select#status {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ===================== SUBMIT BUTTON ===================== */
+form button[type="submit"] {
+    margin-top: 15px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+form button[type="submit"]:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.3);
+}
+
+form button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    form { padding: 25px; }
+    h1 { font-size: 1.75rem; }
+}
+</style>
+</head>
+
+<body>
+<div id="toast"></div>
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='admin-dashboard'">← Back to Home</button>
+  </div>
+</div>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg"
+     alt="Ashoka Chakra"
+     class="chakra-bg">
+
+<h1>Election Settings</h1>
+
+<form onsubmit="saveSettings(event)">
+    <div class="form-section">
+        <label class="label-strip" for="title">Election Title</label>
+        <input type="text" id="title" name="title" placeholder="e.g. Lok Sabha 2026" required>
+    </div>
+
+    <div class="form-section">
+        <label class="label-strip" for="start">Start Date & Time</label>
+        <input type="datetime-local" id="start" name="start" required>
+    </div>
+
+    <div class="form-section">
+        <label class="label-strip" for="end">End Date & Time</label>
+        <input type="datetime-local" id="end" name="end" required>
+    </div>
+
+    <div class="form-section">
+        <label class="label-strip" for="status">Current Status</label>
+        <select id="status">
+            <option value="upcoming">⏳ Upcoming</option>
+            <option value="ongoing">🟢 Ongoing</option>
+            <option value="completed">🏁 Completed</option>
+        </select>
+    </div>
+
+    <button type="submit">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="stroke-width: 2.5;">
+            <path d="M5 13l4 4L19 7"></path>
+        </svg>
+        Save Configuration
+    </button>
+</form>
+
+<script>
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "show " + type;
+    
+    // Hide after 3 seconds
+    setTimeout(() => { 
+        toast.className = toast.className.replace("show", ""); 
+    }, 3000);
+}
+function saveSettings(event) {
+    event.preventDefault();
+
+    const title = document.getElementById("title").value;
+    const start = document.getElementById("start").value;
+    const end = document.getElementById("end").value;
+    const status = document.getElementById("status").value;
+
+    const settings = {
+        title: title,
+        start_date: start,
+        end_date: end,
+        status: status
+    };
+
+    fetch("http://localhost:5001/save_election_settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+    })
+    .then(data => {
+        // Replaced alert with Toast
+        showToast("Election Settings Saved Successfully!", "success");
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        // Replaced alert with Toast
+        showToast("Error saving settings.", "error");
+    });
+}
+function updateStatus() {
+    const startVal = document.getElementById("start").value;
+    const endVal = document.getElementById("end").value;
+    
+    if(!startVal || !endVal) return;
+
+    const start = new Date(startVal);
+    const end = new Date(endVal);
+    const now = new Date();
+
+    let status = "upcoming";
+
+    if (now >= start && now <= end) {
+        status = "ongoing";
+    } else if (now > end) {
+        status = "completed";
+    }
+
+    document.getElementById("status").value = status;
+}
+document.getElementById("start").addEventListener("change", updateStatus);
+document.getElementById("end").addEventListener("change", updateStatus);
+</script>
+
+</body>
+</html>

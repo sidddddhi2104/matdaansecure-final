@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Feedback Status | Voter Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --primary: #1E3A8A;
+            --secondary: #0EA5E9;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top left, #f8fafc, #eff6ff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+ /* ===== COMMON APP BAR ===== */
+  .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;   /* ⬅ reduce from 24px */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 3000;
+  box-sizing: border-box; /* ⬅ VERY IMPORTANT */
+}
+
+
+    .header-left{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img{
+      width: 38px;
+      height: 38px;
+    }
+
+    .header-left span{
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+
+    .header-right button{
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .header-right button:hover{
+      background: #2563EB;
+    }
+
+        .main-container {
+            width: 100%;
+            max-width: 550px;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em; }
+        p.subtitle { color: #64748b; margin-bottom: 30px; font-size: 0.95rem; }
+
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        select, input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        select { background-color: #f1f5f9; cursor: pointer; flex: 1; }
+        input { flex: 2; }
+        
+        select:focus, input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        button:hover { background: #1e40af; }
+        button:active { transform: scale(0.98); }
+
+        /* Result Card Styling */
+        .result-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            margin-top: 25px;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: left;
+            animation: slideUp 0.4s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--secondary);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card h3 { 
+            color: var(--primary); 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em;
+            margin-bottom: 15px;
+            background: #eff6ff;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .data-row:last-child { border: none; }
+        .label { color: #64748b; font-size: 0.9rem; }
+        .value { font-weight: 600; font-size: 0.9rem; }
+
+        /* Enhanced Status Badges */
+.status {
+    padding: 4px 12px;
+    border-radius: 99px; /* Pill shape */
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Vibrantly colored statuses with subtle borders */
+.status.pending { 
+    background-color: #fef9c3; 
+    color: #854d0e; 
+    border: 1px solid #fde047;
+}
+.status.pending::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: #ca8a04;
+    border-radius: 50%;
+}
+
+.status.approved { 
+    background-color: #dcfce7; 
+    color: #166534; 
+    border: 1px solid #86efac;
+}
+.status.approved::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: #22c55e;
+    border-radius: 50%;
+}
+
+.status.rejected { 
+    background-color: #fee2e2; 
+    color: #991b1b; 
+    border: 1px solid #fca5a5;
+}
+.status.rejected::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: #ef4444;
+    border-radius: 50%;
+}
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 480px) {
+            .input-group { flex-direction: column; }
+            .main-container { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+
+<div class="main-container">
+    <h1>Feedback Tracker</h1>
+    <p class="subtitle">Enter your details below to check the latest status</p>
+
+    <div class="search-box">
+        <div class="input-group">
+            <select id="feedbackType">
+                <option value="correction">Correction</option>
+                <option value="complaint">Complaint</option>
+                <option value="suggestion">Suggestion</option>
+            </select>
+            <input type="text" id="searchKey" placeholder="Reference ID (e.g. REF123)">
+        </div>
+        <button onclick="searchStatus()">Track Status</button>
+    </div>
+
+    <div id="results"></div>
+</div>
+
+<script>
+function searchStatus() {
+    const key = document.getElementById("searchKey").value.trim();
+    const type = document.getElementById("feedbackType").value;
+
+    if (!key) {
+        alert("Please enter a Reference ID!");
+        return;
+    }
+
+    const results = document.getElementById("results");
+    results.innerHTML = '<div class="loader"></div>';
+
+    fetch("/track_feedback_status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference_id: key, feedback_type: type })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Offline Mode"); // Triggers fallback if no server
+        return res.json();
+    })
+    .then(data => {
+        renderResult(data);
+    })
+    .catch(err => {
+        console.log("Using Mock Data for Demo...");
+        // This is MOCK DATA so you can see it working without a database
+        const mockData = {
+            found: true,
+            feedback_type: type.toUpperCase(),
+            reference_id: key,
+            voter_id: "VOT-992834",
+            status: "APPROVED", // Change this to PENDING or REJECTED to test colors
+            created_at: "2024-05-20",
+            field_name: "Date of Birth",
+            new_value: "15/08/1995",
+            message: "This is a sample message for your feedback."
+        };
+        renderResult(mockData);
+    });
+}
+
+function renderResult(data) {
+    const results = document.getElementById("results");
+    results.innerHTML = "";
+
+    if (!data || data.found === false) {
+        results.innerHTML = "<p style='margin-top:20px;color:#64748b;'>No matching record found.</p>";
+        return;
+    }
+
+    // Checking if it's an Approved Correction
+    const isApprovedCorrection = 
+        data.status.toUpperCase() === "APPROVED" && 
+        data.feedback_type.toUpperCase() === "CORRECTION";
+
+    const card = document.createElement("div");
+    card.className = "result-card";
+
+    let detailsHtml = `
+        <h3>${data.feedback_type} Details</h3>
+        <div class="data-row"><span class="label">Ref ID</span><span class="value">${data.reference_id}</span></div>
+        <div class="data-row"><span class="label">Status</span><span class="status ${data.status.toLowerCase()}">${data.status}</span></div>
+        <div class="data-row"><span class="label">Date</span><span class="value">${data.created_at}</span></div>
+    `;
+
+    // The Success Message Box
+    if (isApprovedCorrection) {
+        detailsHtml += `
+            <div style="margin-top:15px; padding:12px; background:#f0fdf4; border:1px dashed #22c55e; border-radius:8px; display:flex; align-items:center; gap:10px;">
+                <span style="font-size:1.1rem;">✅</span>
+                <p style="color:#166534; font-size:0.85rem; font-weight:500; margin:0;">
+                    Record updated! **Now you can use the corrected value for registration.**
+                </p>
+            </div>
+        `;
+    }
+
+    // Logic for Correction vs others
+    if (data.feedback_type.toUpperCase() === "CORRECTION") {
+        detailsHtml += `
+            <div class="data-row" style="margin-top:10px;"><span class="label">Field</span><span class="value">${data.field_name || "-"}</span></div>
+            <div class="data-row"><span class="label">New Value</span><span class="value" style="color:#16a34a;">${data.new_value || "-"}</span></div>
+        `;
+    } else {
+        detailsHtml += `<div class="data-row" style="margin-top:10px;"><span class="label">Message</span><span class="value">${data.message || "-"}</span></div>`;
+    }
+
+    card.innerHTML = detailsHtml;
+    results.appendChild(card);
+}
+</script>
+</body>
+</html>

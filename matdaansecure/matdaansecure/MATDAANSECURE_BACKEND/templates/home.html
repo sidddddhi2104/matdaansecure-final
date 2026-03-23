@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="google" content="notranslate">
+<meta charset="UTF-8">
+<title>Home | MATDAANSECURE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== RESET ===== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{
+  background:linear-gradient(to bottom,#ffffff,#f9fafb);
+  color:#111827;transition:background 0.4s,color 0.4s;
+  font-size:16px;overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit;}
+ul{list-style:none;}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo{
+  height:56px;
+  padding:2px;
+  background:white;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* ===== ASHOKA CHAKRA BACKGROUND ===== */
+.chakra-bg {
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:15cm;height:15cm;opacity:0.04;z-index:0;
+  animation:spin 25s linear infinite;pointer-events:none;
+}
+@keyframes spin {0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+
+/* ===== HEADER ===== */
+header {
+    background: #1E3A8A;
+    position: sticky;        /* keeps it sticky */
+    top: 0;                  /* stick to the very top */
+    z-index: 1000;           /* stay above other content */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* Optional: add a small transition for scroll effect */
+header.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+header h1{font-size:1.8rem;letter-spacing:1px;}
+.controls{display:flex;gap:10px;align-items:center;position:relative;}
+.controls button,.controls select{
+  padding:5px 8px;border:none;border-radius:4px;cursor:pointer;
+}
+.controls button{
+  background:white;color:#1E3A8A;transition:all 0.3s;
+}
+.controls button:hover{
+  background:#2563EB;color:white;transform:scale(1.05);
+}
+.controls select{background:white;color:#1E3A8A;}
+
+/* ===== TOP BAR NOTIFICATION ===== */
+.notification-container {
+  position: relative;
+}
+
+.notification-btn {
+  background: white;
+  color: #1E3A8A;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.notification-btn:hover {
+  background: #2563EB;
+  color: white;
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #dc2626;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: none; /* JavaScript changes this to flex */
+  align-items: center;
+  justify-content: center;
+  z-index: 10;                /* Ensures it stays on top */
+  border: 2px solid #1E3A8A;   /* Matches header color for a clean look */
+  pointer-events: none;       /* Clicks pass through to the button */
+}
+
+/* ===== PROFILE DROPDOWN ===== */
+.profile-container {
+  position: relative;
+}
+.profile-btn {
+  background:white;color:#1E3A8A;
+  border:none;border-radius:50%;width:40px;height:40px;
+  font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.3s,transform 0.3s;
+}
+.profile-btn:hover {
+  background:#2563EB;color:white;transform:scale(1.1);
+}
+/* ===== PROFESSIONAL PROFILE CARD ===== */
+.profile-container {
+  position: relative;
+}
+
+.profile-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.8rem;
+  color: #1e3a8a;
+  transition: transform 0.2s ease;
+}
+.profile-btn:hover {
+  transform: scale(1.1);
+}
+
+.profile-card {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background: white;
+  color: #111827;
+  width: 280px;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeIn 0.25s ease;
+}
+.profile-card.active {
+  display: flex;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+}
+.profile-pic {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f3f4f6;
+}
+.profile-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+.profile-header p {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+}
+.profile-actions a {
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.3s;
+}
+.profile-actions a:hover {
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 0;
+  padding: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.3s;
+}
+.logout-btn:hover {
+  background: #b91c1c;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* HEARTBEAT ANIMATION BUTTON */
+.heart-btn {
+  padding: 12px 28px;
+  background: #DC2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  animation: heartbeat 1.4s infinite;
+  transition: 0.3s;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.08); }
+  40% { transform: scale(1); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.heart-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
+}
+/* ===== CONTINUOUS RIGHT → LEFT SCROLLBAR ===== */
+.scroll-updates {
+    width: 100%;
+    overflow: hidden;
+    background: #eef2ff;
+    padding: 12px 0;
+    border-radius: 10px;
+    margin-top: 0;
+}
+
+.scroll-track {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll-left 15s linear infinite;
+}
+
+.update {
+    margin-right: 60px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #1E3A8A;
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* ===== DARK MODE TOGGLE ===== */
+.toggle {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  background: #111;
+  border-radius: 30px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.4);
+  transition: background 0.5s ease;
+}
+.toggle .circle {
+  position: absolute;
+  top: 2px;left: 2px;
+  width: 24px;height: 24px;
+  background: #fff;border-radius: 50%;
+  transition: transform 0.5s ease, background 0.5s ease;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+.toggle.active { background:#0EA5E9; }
+.toggle.active .circle { transform:translateX(22px);background:#111; }
+
+/* ===== NAVIGATION ===== */
+nav{
+  position: sticky;
+  top: calc(15px + 1.8rem + 20px);  display:flex;
+  justify-content:center;
+  background:#111827;
+  flex-wrap:wrap;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 999;
+}
+nav a{
+  position: relative;
+  color:#d1d5db;
+  margin:0 15px;padding:12px 8px;
+  font-size:16px;font-weight:500;
+  transition:color 0.3s ease;
+  z-index:1;
+}
+nav a:hover, nav a.active { color:#0EA5E9; font-weight:600; }
+
+/* ===== HERO ===== */
+.hero{
+  text-align:center;padding:60px 20px;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(8px);
+  margin:20px auto;border-radius:15px;
+  max-width:1000px;box-shadow:0 8px 25px rgba(0,0,0,0.12);
+  animation:fadeIn 1.2s ease;
+}
+.hero h2{color:#1E3A8A;font-size:2.2rem;margin-bottom:10px;}
+.hero p{font-size:1.1rem;margin-bottom:20px;color:#374151;}
+.countdown{
+  font-size:1.2rem;color:#059669;
+  background:#ecfdf5;padding:12px;border-radius:8px;
+  display:inline-block;animation:pulse 2s infinite;
+}
+
+
+/* ===== SECTIONS ===== */
+section{
+  padding:40px 20px;max-width:1100px;margin:auto;
+  margin-top:30px;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(10px);
+  border-radius:15px;box-shadow:0 6px 20px rgba(0,0,0,0.08);
+  animation:fadeInUp 1s ease forwards;
+  transform:translateY(30px);opacity:0;
+}
+section h3{
+  color:#1E3A8A;margin-bottom:15px;
+  border-left:5px solid #0EA5E9;padding-left:10px;
+}
+section p{margin-bottom:15px;line-height:1.5;}
+.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.buttons a {
+  padding:10px 15px;
+  background:#0EA5E9;color:white;
+  border-radius:8px;transition:all 0.3s;
+}
+.buttons a:hover { background:#2563EB; transform: scale(1.07); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* ===== FOOTER ===== */
+footer{
+  background:#1E3A8A;color:white;
+  padding:20px;text-align:center;
+  margin-top:30px;box-shadow:0 -4px 15px rgba(0,0,0,0.15);
+}
+
+
+.notify-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #1E3A8A;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  animation: fadeIn 0.4s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp{to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+/* ===== FIX FOR STICKY HEADER OVERLAP ===== */
+
+/* =====================================================
+   MATDAANSECURE – PROFESSIONAL DARK THEME
+   Works with: body.dark-mode
+===================================================== */
+
+body.dark-mode {
+  background: linear-gradient(to bottom, #020617, #0B1220);
+  color: #E5E7EB;
+}
+
+/* ===== GLOBAL TEXT ===== */
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode li {
+  color: #D1D5DB;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4 {
+  color: #F9FAFB;
+}
+
+/* ===== HEADER ===== */
+body.dark-mode header {
+  background: #020617;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+}
+
+body.dark-mode .brand h1 {
+  color: #F9FAFB;
+}
+
+/* ===== NAVIGATION ===== */
+body.dark-mode nav {
+  background: #020617;
+}
+
+body.dark-mode nav a {
+  color: #9CA3AF;
+}
+
+body.dark-mode nav a:hover,
+body.dark-mode nav a.active {
+  color: #38BDF8;
+}
+
+/* ===== CONTROLS BUTTONS ===== */
+body.dark-mode .controls button,
+body.dark-mode .controls select {
+  background: #1F2937;
+  color: #E5E7EB;
+}
+
+body.dark-mode .controls button:hover {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+/* ===== NOTIFICATION BUTTON ===== */
+body.dark-mode .notification-btn {
+  background: #1F2937;
+  color: #38BDF8;
+}
+
+body.dark-mode .notification-btn:hover {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+/* ===== PROFILE DROPDOWN ===== */
+body.dark-mode .profile-card {
+  background: #111827;
+  color: #E5E7EB;
+}
+
+body.dark-mode .profile-header h4 {
+  color: #38BDF8;
+}
+
+body.dark-mode .profile-header p {
+  color: #9CA3AF;
+}
+
+body.dark-mode .profile-actions a:hover {
+  background: #1E293B;
+  color: #38BDF8;
+}
+
+/* ===== HERO ===== */
+body.dark-mode .hero {
+  background: rgba(17, 24, 39, 0.95);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+}
+
+body.dark-mode .hero p {
+  color: #9CA3AF;
+}
+
+/* ===== SECTIONS ===== */
+body.dark-mode section {
+  background: rgba(17, 24, 39, 0.97);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.6);
+}
+
+body.dark-mode section h3 {
+  color: #38BDF8;
+  border-left-color: #2563EB;
+}
+
+/* ===== BUTTONS ===== */
+body.dark-mode .buttons a {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+body.dark-mode .buttons a:hover {
+  background: #38BDF8;
+  color: #020617;
+}
+
+/* ===== HEART BUTTON ===== */
+body.dark-mode .heart-btn {
+  background: #DC2626;
+}
+
+body.dark-mode .heart-btn:hover {
+  background: #B91C1C;
+}
+
+/* ===== SCROLL UPDATES ===== */
+body.dark-mode .scroll-updates {
+  background: #020617;
+}
+
+body.dark-mode .update {
+  color: #38BDF8;
+}
+
+/* ===== COUNTDOWN ===== */
+body.dark-mode .countdown {
+  background: #022C22;
+  color: #22C55E;
+}
+
+/* ===== FOOTER ===== */
+body.dark-mode footer {
+  background: #020617;
+  color: #9CA3AF;
+}
+
+/* ===== INPUT / HR FIX ===== */
+body.dark-mode hr {
+  border-color: #1E293B;
+}
+</style>
+</head>
+<body>
+<!-- Google Translate (Hidden) -->
+<div id="google_translate_element"></div>
+
+<div class="chakra-bg">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" width="100%" height="100%">
+</div>
+
+<header>
+  <div class="brand">
+    <img src="/static/logo.png" alt="MATDAANSECURE Logo" class="logo">
+    <h1>MATDAANSECURE</h1>
+  </div>
+
+  <div class="controls">
+    <button onclick="changeFontSize(2)">A+</button>
+    <button onclick="changeFontSize(-2)">A-</button>
+    <button onclick="resetFontSize()">A</button>
+    <button onclick="toggleDarkMode()">🌙</button>
+    <select onchange="changeLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="hi">हिंदी</option>
+      <option value="mr">मराठी</option>
+    </select>
+<!-- NOTIFICATION ICON -->
+<div class="notification-container">
+  <button class="notification-btn" onclick="markAsReadAndNavigate()">
+    🔔
+  </button>
+  <span id="topNotifBadge" class="notification-badge"></span>
+</div>
+
+<!-- PROFILE MENU -->
+<div class="profile-container">
+  <button class="profile-btn">👤</button>
+
+
+  <div class="profile-card" id="profileDropdown">
+    
+    <!-- HEADER -->
+    <div class="profile-header">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-pic">
+      <div>
+        <h4 id="userName">Loading...</h4>
+        <p id="userEmail">Loading...</p>
+        <p id="userVoterID" style="font-size:0.85rem;color:#3b82f6;">Loading...</p>
+	
+      </div>
+    </div>
+    <hr>
+    <!-- LAST LOGIN -->
+    <div class="last-login">
+      <p>Last Login: <span id="lastLoginText">12 Feb 2025, 4:30 PM</span></p>
+    </div>
+    <hr>
+    <!-- MAIN ACTIONS -->
+    <div class="profile-actions">
+      <a href="/overview" id="overviewBtn">👁‍🗨 Profile Overview</a>
+<a href="/notifications.html">🔔 Notifications</a>
+      <a href="/change-password.html">🔑 Change Password</a>
+    </div>
+
+    <hr>
+
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</div>
+</header>
+
+<nav>
+  <a href="\candidates">Know Your Candidate</a>
+  <a href="elector-roll.html">Elector Roll Call</a>
+  <a href="about.html">About MATDAANSECURE</a>
+</nav>
+
+<main class="page-content">
+<!-- ===== CONTINUOUS SCROLLING ANNOUNCEMENT ===== -->
+<div class="scroll-updates">
+<!-- Published Result Box -->
+<div id="resultBox" style="max-width:900px;margin:20px auto;text-align:center;"></div>
+    <div class="scroll-track">
+        <span class="update">📢 New Election Added: University Student Council 2025</span>
+        <span class="update">🟢 Voting Window Opens Tomorrow — Stay Ready!</span>
+        <span class="update">🔒 Your Vote is 100% Secure & Encrypted</span>
+        <span class="update">📊 Results will be published by the Admin</span>
+        <span class="update">📝 Correction Window is now Open for Voter Details</span>
+        <span class="update">⚠️ Do not share your login credentials with anyone</span>
+
+        <!-- Duplicate for perfect loop -->
+        <span class="update">📢 New Election Added: University Student Council 2025</span>
+        <span class="update">🟢 Voting Window Opens Tomorrow — Stay Ready!</span>
+        <span class="update">🔒 Your Vote is 100% Secure & Encrypted</span>
+        <span class="update">📊 Results will be published by the Admin</span>
+        <span class="update">📝 Correction Window is now Open for Voter Details</span>
+        <span class="update">⚠️ Do not share your login credentials with anyone</span>
+    </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h2 id="welcomeText">Welcome to MATDAANSECURE</h2>
+  <p>Empowering Democracy, One Click At A Time</p>
+<div id="election-info-section">
+    <h2>Election Information</h2>
+    <p><b>Title:</b> <span id="title_display">Loading...</span></p>
+    <p><b>Start Date:</b> <span id="start_date_display">Loading...</span></p>
+    <p><b>End Date:</b> <span id="end_date_display">Loading...</span></p>
+    <p><b>Status:</b> <span id="status_display">Loading...</span></p>
+    <h3 id="countdown"></h3>
+</div>
+<div id="election-section">
+<p id="publishedResult" 
+   style="display:none; background:white; padding:12px; border-radius:8px; margin-top:15px; font-weight:600; color:#0EA5E9;">
+</p>
+<button id="voteNowBtn" class="heart-btn" onclick="startVoting()">
+  Vote Now
+</button>
+
+<button id="viewResultBtn"
+        class="heart-btn"
+        style="display:none; background:#059669;"
+        onclick="location.href='result.html'">
+  🏆 View Result
+</button>
+</div>
+</div>
+
+<!-- Complaints -->
+<section>
+  <h3>Register Complaints</h3>
+  <p>If you have any issues, you can register your complaints with MATDAANSECURE.</p>
+  <div class="buttons"><a href="/complaints">Register Complaint</a></div>
+</section>
+
+<!-- Suggestions -->
+<section>
+  <h3>Share Suggestions</h3>
+  <p>Your feedback helps us improve. Share your valuable suggestions.</p>
+  <div class="buttons"><a href="suggestion.html">Share Suggestion</a></div>
+</section>
+
+<!-- Corrections -->
+<section>
+  <h3>Make Correction</h3>
+  <p>Make correction in your existing Voting Credentials.</p>
+  <div class="buttons"><a href="/correction">Make Correction</a></div>
+</section>
+
+<!-- Status -->
+<section>
+  <h3>Track your Feedback</h3>
+  <p>Check whether your feedback is approved or rejected.</p>
+  <div class="buttons"><a href="mystatus.html">Track</a></div>
+</section>
+
+<!-- Contact -->
+<section>
+  <h3>Contact Us</h3>
+  <p><strong>📞 Phone:</strong> +91 99999 99999<br>
+     <strong>📧 Email:</strong> voterhelp@example.com<br>
+     <strong>🏠 Address:</strong> Voter Service Center, 2nd Floor, Government Building, MG Road, Mumbai - 400001</p>
+</section>
+
+<!-- Find Us Section -->
+<section>
+ <h3>Find Us</h3>
+ <p><b>Visit the Election Office at the heart of Fort, Mumbai.</b></p>
+ <iframe
+   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15084.071889084018!2d72.83607!3d18.932!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7cf7f1c1c5f1f%3A0xabcdef1234567890!2sGreat%20Western%20Building%20Fort%2C%20Mumbai!5e0!3m2!1sen!2sin!4v169xxxxxxx!5m2!1sen!2sin"
+   width="100%" height="250" style="border:0;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.2);" allowfullscreen="" loading="lazy">
+ </iframe>
+
+ <div style="text-align:center; margin-top:20px;">
+  <h4 style="color:#0EA5E9;">Connect With Us</h4>
+  <div class="social-icons" style="display:flex; justify-content:center; gap:25px; margin-top:10px;">
+    <a href="https://twitter.com" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" width="40"></a>
+    <a href="https://youtube.com" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" width="40"></a>
+    <a href="https://facebook.com" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384053.png" width="40"></a>
+    <a href="https://instagram.com" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" width="40"></a>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer>
+
+  <p>&copy; 2025 MATDAANSECURE. All Rights Reserved.</p>
+</footer>
+
+<script>
+/* ==========================================
+   LOAD ELECTION FROM BACKEND
+========================================== */
+async function loadElection() {
+  const titleDisplay = document.getElementById("title_display");
+  const startDateDisplay = document.getElementById("start_date_display");
+  const endDateDisplay = document.getElementById("end_date_display");
+  const statusDisplay = document.getElementById("status_display");
+  const countdownElement = document.getElementById("countdown");
+  const electionSection = document.getElementById("election_section");
+
+  try {
+    const res = await fetch("http://localhost:5001/get_election_settings");
+    const data = await res.json();
+
+    if (data.error) {
+      titleDisplay.textContent = "No election found";
+      return;
+    }
+
+    titleDisplay.textContent = data.title;
+    startDateDisplay.textContent = data.start_date;
+    endDateDisplay.textContent = data.end_date;
+    statusDisplay.textContent = data.status;
+
+    if (data.status === "Published") {
+      countdownElement.textContent = "Election completed.";
+
+      const btn = document.createElement("div");
+      btn.id = "view-results-btn-container";
+      btn.style.textAlign = "center";
+      btn.style.marginTop = "15px";
+      btn.innerHTML = `
+        <a href="result.html"
+           style="background:#059669;color:#fff;padding:12px 25px;
+                  border-radius:8px;font-weight:600;">
+           View Results 🏆
+        </a>`;
+      electionSection.appendChild(btn);
+
+    } else {
+      runElectionCountdown(data.start_date, data.end_date);
+    }
+
+  } catch (err) {
+    console.error("Failed to load election:", err);
+    statusDisplay.innerHTML =
+      '<span style="color:red;">Server connection failed</span>';
+  }
+}
+
+
+/* ==========================================
+   COUNTDOWN
+========================================== */
+function runElectionCountdown(start_date, end_date) {
+  const countdownElement = document.getElementById("countdown");
+  const startTime = new Date(start_date).getTime();
+  const endTime = new Date(end_date).getTime();
+
+  const timer = setInterval(() => {
+    const now = Date.now();
+    let target, label;
+
+    if (now < startTime) {
+      target = startTime;
+      label = "Voting starts in:";
+    } else if (now <= endTime) {
+      target = endTime;
+      label = "Voting ends in:";
+    } else {
+      clearInterval(timer);
+      countdownElement.textContent = "Election has ended.";
+      return;
+    }
+
+    const diff = target - now;
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    countdownElement.innerHTML =
+      `<div class="countdown">${label} ${d}d ${h}h ${m}m ${s}s</div>`;
+  }, 1000);
+}
+
+/* ==========================================
+   UI UTILITIES
+========================================== */
+function changeFontSize(delta){
+  let size = parseFloat(getComputedStyle(document.body).fontSize);
+  size += delta;
+  document.body.style.fontSize = size + "px";
+  localStorage.setItem("fontSize", size);
+}
+
+function resetFontSize(){
+  document.body.style.fontSize = "16px";
+  localStorage.setItem("fontSize", 16);
+}
+
+function toggleDarkMode(){
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem("darkMode",
+    document.body.classList.contains("dark-mode"));
+}
+
+// Auto-apply saved language on page load
+window.addEventListener('load', () => {
+    const savedLang = localStorage.getItem("lang");
+    if (savedLang && savedLang !== 'en') {
+        changeLanguage(savedLang);
+    }
+});
+const profileBtn = document.querySelector(".profile-btn");
+const profileCard = document.getElementById("profileDropdown");
+
+profileBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // stop body click
+  profileCard.classList.toggle("active");
+});
+// Close when clicking outside
+document.addEventListener("click", (e) => {
+  if (!profileCard.contains(e.target) && !profileBtn.contains(e.target)) {
+    profileCard.classList.remove("active");
+  }
+});
+function loadNotificationBadge() {
+  fetch("http://127.0.0.1:5001/notifications/unread-count")
+    .then(res => res.json())
+    .then(data => {
+      console.log("Checking notifications...", data.count); // This confirms it's running
+      const badge = document.getElementById("topNotifBadge");
+      if (!badge) return;
+
+      if (data.count && data.count > 0) {
+        badge.textContent = data.count > 99 ? '99+' : data.count;
+        badge.style.display = "flex";
+      } else {
+        badge.style.display = "none";
+      }
+    })
+    .catch(err => console.error("Notification check failed. Is the backend running?"));
+}
+// PASTE THIS IMMEDIATELY AFTER loadNotificationBadge() function
+function markAsReadAndNavigate() {
+    // 1. Tell the backend to mark all as read
+    fetch("http://127.0.0.1:5001/notifications/mark-read", { method: "POST" })
+    .then(() => {
+        // 2. Hide the badge immediately on the UI
+        const badge = document.getElementById("topNotifBadge");
+        if (badge) badge.style.display = "none";
+        
+        // 3. Navigate to the notifications page
+        window.location.href = '/notifications.html';
+    })
+    .catch(err => {
+        console.error("Error marking read:", err);
+        window.location.href = '/notifications.html';
+    });
+}
+async function loadUserProfile() {
+  const voterId =
+    localStorage.getItem("voter_id") ||
+    localStorage.getItem("voterID");
+
+  if (!voterId) {
+    alert("Session expired. Please login again.");
+    window.location.href = "/login";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://127.0.0.1:5001/get-user-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ voter_id: voterId })
+    });
+
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById("userName").textContent = data.name;
+    document.getElementById("userEmail").textContent = data.email;
+    document.getElementById("userVoterID").textContent =
+      "Voter ID: " + data.voterID;
+
+  } catch (err) {
+    console.error("Profile load failed:", err);
+    alert("Unable to load profile. Please login again.");
+    window.location.href = "/login";
+  }
+}
+/* ==========================================
+   PAGE LOAD (CORRECTED)
+========================================== */
+window.onload = () => {
+    loadElection();
+    loadUserProfile(); 
+
+    const now = new Date().toLocaleString();
+    localStorage.setItem("lastLogin", now);
+
+    document.body.style.fontSize =
+        (localStorage.getItem("fontSize") || 16) + "px";
+
+    if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+    }
+
+    const lastLoginEl = document.getElementById("lastLoginText");
+    if (lastLoginEl) {
+        lastLoginEl.textContent = localStorage.getItem("lastLogin") || "Not Available";
+    }
+
+    loadNotificationBadge();
+    setInterval(loadNotificationBadge, 15000);
+}; // <--- THIS WAS MISSING
+
+/* ==========================================
+   LOGOUT
+========================================== */
+function logout() {
+    localStorage.clear();
+    alert("Logged out successfully");
+    window.location.href = "start.html";
+}
+</script>
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, onSnapshot } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyCEoerP_xiqcZMkIc6I83Kka6l3OI9CetQ",
+  authDomain: "matdaan-d1486.firebaseapp.com",
+  projectId: "matdaan-d1486",
+  storageBucket: "matdaan-d1486.firebasestorage.app",
+  messagingSenderId: "484649301509",
+  appId: "1:484649301509:web:c61b2a4720343cb3dc0e6c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+/* ================= RESULT PUBLISH ================= */
+/* ================= RESULT PUBLISH ================= */
+onSnapshot(doc(db, "publish", "result"), snap => {
+  const voteBtn = document.getElementById("voteNowBtn");
+  const resultBtn = document.getElementById("viewResultBtn");
+  const resultBox = document.getElementById("publishedResult");
+
+  if (!snap.exists() || snap.data().isPublished !== true) {
+    // ❌ Result not published
+    if (resultBtn) resultBtn.style.display = "none";
+    if (resultBox) resultBox.style.display = "none";
+    return;
+  }
+
+  // ✅ Result published
+  if (voteBtn) voteBtn.style.display = "none";
+  if (resultBtn) resultBtn.style.display = "inline-block";
+
+  if (resultBox) {
+    resultBox.style.display = "block";
+    resultBox.textContent =
+      "📢 Election Result is Live now!";
+  }
+});
+/* ================= VOTING STATUS ================= */
+onSnapshot(doc(db, "election", "votingStatus"), snap => {
+  const voteBtn = document.getElementById("voteNowBtn");
+  if (!voteBtn) return;
+  // Hide button if voting not allowed
+  if (!snap.exists() || snap.data().isVotingAllowed !== true) {
+    voteBtn.style.display = "none";
+    return;
+  }
+  // Show button when voting is allowed
+  voteBtn.style.display = "inline-block";
+});
+</script>
+<script>
+function startVoting() {
+  // Try multiple possible locations
+  const userProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
+  const voterId =
+    userProfile.voterID ||
+    userProfile.voterId ||
+    userProfile.voter_id ||
+    localStorage.getItem("voter_id") ||
+    localStorage.getItem("voterID");
+
+ if (!voterId) {
+  alert("Session expired. Please login again.");
+  console.warn("Session expired: voter_id not found");
+  window.location.href = "/login";
+  return;
+}
+  // Store for face verification
+  sessionStorage.setItem("voter_id", voterId);
+  console.log("✅ Voter ID stored for verification:", voterId);
+  // Redirect
+  window.location.href = "/face-verify";
+}
+</script>
+</body>
+</html>

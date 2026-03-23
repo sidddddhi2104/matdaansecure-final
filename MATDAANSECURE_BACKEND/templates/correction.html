@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Correction Form | MATDAANSECURE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/static/images/logo.png">
+
+<style>
+  * {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+  
+  body {
+    background: white;
+    padding: 100px 20px 40px;
+    color: #111827;
+    min-height: 100vh;
+  }
+
+  /* ===== APP BAR ===== */
+  .app-header {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 64px;
+    background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 3000;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-left img { width: 38px; height: 38px; }
+  .header-left span { font-size: 22px; font-weight: 700; color: #1E3A8A; }
+
+  .header-right button {
+    background: #1E3A8A; color: #ffffff; border: none;
+    padding: 8px 16px; border-radius: 8px; font-size: 14px;
+    cursor: pointer; transition: 0.3s;
+  }
+
+  .container {
+    max-width: 850px; margin: auto; background: #ffffff;
+    padding: 40px; border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.05);
+    position: relative; z-index: 1;
+  }
+
+  h1 { text-align: center; color: #1E3A8A; margin-bottom: 30px; font-weight: 800; }
+  h2 { color: #0EA5E9; margin-bottom: 20px; font-size: 1.5rem; }
+  
+  label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+  
+  input, select {
+    width: 100%; padding: 12px; margin-bottom: 20px;
+    border: 1.5px solid #e5e7eb; border-radius: 10px;
+    background: #f9fafb; font-size: 1rem; transition: all 0.3s;
+  }
+
+  input:focus, select:focus {
+    border-color: #0EA5E9; outline: none; background: #fff;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+  }
+
+  .submit-btn {
+    background: linear-gradient(to right, #1E3A8A, #2563EB);
+    color: #fff; padding: 16px 30px; border: none;
+    border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+    cursor: pointer; width: 100%; transition: all 0.3s;
+  }
+
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.3); }
+
+  /* ===== SUCCESS POPUP ===== */
+  .popup {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
+    justify-content: center; align-items: center; z-index: 4000;
+  }
+
+  .popup-content {
+    background: #fff; padding: 40px; border-radius: 30px;
+    text-align: center; width: 90%; max-width: 450px;
+    transform: translateY(50px); opacity: 0;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .popup.active .popup-content { transform: translateY(0); opacity: 1; }
+
+  .success-visual { width: 80px; height: 80px; margin: 0 auto 20px; }
+  .circle-bg { fill: none; stroke: #f0fdf4; stroke-width: 4; }
+  .circle-check {
+    fill: none; stroke: #22c55e; stroke-width: 4; stroke-linecap: round;
+    stroke-dasharray: 100; stroke-dashoffset: 100;
+    animation: drawCheck 0.8s forwards 0.3s;
+  }
+  @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+  .ref-box {
+    background: #f8fafc; border: 2px solid #e2e8f0;
+    padding: 20px; border-radius: 15px; margin: 25px 0;
+    position: relative; overflow: hidden;
+  }
+
+  .ref-box::after {
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(14, 165, 233, 0.05), transparent);
+    transform: rotate(45deg); animation: shimmer 3s infinite;
+  }
+  @keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+
+  .ref-code {
+    display: block; font-family: 'Monaco', monospace; font-size: 1.4rem;
+    color: #1E3A8A; font-weight: 800; letter-spacing: 1px;
+  }
+
+  .copy-btn {
+    background: #111827; color: #fff; border: none; width: 100%;
+    padding: 14px; border-radius: 50px; cursor: pointer; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .toast {
+    position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+    background: #111827; color: white; padding: 12px 25px; border-radius: 50px;
+    transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 5000; font-weight: 600;
+  }
+  .toast.show { bottom: 40px; }
+</style>
+</head>
+
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+
+<h1>Submit a Correction</h1>
+
+<div class="container">
+  <h2>Correction Details</h2>
+
+  <form onsubmit="submitCorrection(event)">
+    <label>Full Name</label>
+    <input type="text" id="name1" placeholder="Enter your full name" required>
+
+    <label>Voter ID Number</label>
+    <input type="text" id="mainVoterID" placeholder="V123" value="V" maxlength="4" required>
+
+    <label>Mobile Number</label>
+    <input type="tel" id="mobile1" placeholder="Enter 10-digit mobile number" required>
+
+    <label>Email ID</label>
+    <input type="email" id="email1" placeholder="example@email.com">
+
+    <label>State</label>
+    <select id="state1" onchange="updateDistricts()" required>
+      <option value="">Select State</option>
+      <option>Maharashtra</option>
+      <option>Gujarat</option>
+      <option>Karnataka</option>
+    </select>
+
+    <label>District</label>
+    <select id="district1" required>
+      <option value="">Select District</option>
+    </select>
+
+    <label>Correction Type *</label>
+    <select id="correction-type" required>
+      <option value="">Select field to correct</option>
+      <option value="fullname">Name</option>
+      <option value="dob">Date Of Birth</option>
+      <option value="address">Address</option>
+      <option value="email">Email</option>
+      <option value="phone">Phone Number</option>
+    </select>
+
+    <label>Old Value</label>
+    <input id="oldValue" placeholder="Current incorrect value in record" required>
+
+    <label>New Value</label>
+    <input id="newValue" placeholder="Corrected value to be updated" required>
+
+    <label>Upload Document *</label>
+    <input type="file" id="correction-file" required>
+
+    <button type="submit" class="submit-btn">Submit Correction</button>
+  </form>
+</div>
+
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <div class="success-visual">
+      <svg viewBox="0 0 52 52"><circle class="circle-bg" cx="26" cy="26" r="25"/><path class="circle-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>
+    </div>
+    <h2 style="color:#111827;">Correction Submitted!</h2>
+    <div class="ref-box">
+      <span style="font-size: 0.75rem; color: #94a3b8; letter-spacing: 2px;">REFERENCE CODE</span>
+      <span id="displayRefCode" class="ref-code">CORR-XXXXXX</span>
+    </div>
+    <button class="copy-btn" onclick="copyRefCode()">📋 Copy Reference Code</button>
+    <p onclick="location.reload()" style="margin-top:20px; cursor:pointer; color: #0EA5E9; font-weight: 600;">Close & Return</p>
+  </div>
+</div>
+
+<div id="toast" class="toast">✔ Reference code copied!</div>
+
+<script>
+let generatedRefCode = "";
+
+const districtsByState = {
+  Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik"],
+  Gujarat: ["Ahmedabad", "Surat", "Vadodara"],
+  Karnataka: ["Bangalore", "Mysore", "Belagavi"]
+};
+
+function updateDistricts(){
+  const state = document.getElementById("state1").value;
+  const district = document.getElementById("district1");
+  district.innerHTML = '<option value="">Select District</option>';
+  if (districtsByState[state]) {
+    districtsByState[state].forEach(d => {
+      const option = document.createElement("option");
+      option.value = d; option.textContent = d;
+      district.appendChild(option);
+    });
+  }
+}
+
+function submitCorrection(e){
+  e.preventDefault();
+
+  const formData = new FormData();
+
+  formData.append("voter_id", document.getElementById("mainVoterID").value.trim());
+  formData.append("field_name", document.getElementById("correction-type").value);
+  formData.append("new_value", document.getElementById("newValue").value.trim());
+
+  const fileInput = document.getElementById("correction-file");
+  formData.append("document", fileInput.files[0]);
+
+  fetch("http://127.0.0.1:5001/submit-correction", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      generatedRefCode = data.reference_code;
+      document.getElementById("displayRefCode").innerText = generatedRefCode;
+
+      const popup = document.getElementById("popup");
+      popup.style.display = "flex";
+      setTimeout(() => popup.classList.add("active"), 50);
+
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(() => alert("Server connection failed"));
+}
+
+function copyRefCode(){
+  navigator.clipboard.writeText(generatedRefCode).then(() => {
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  });
+}
+
+function applyVoterIDLogic() {
+  const input = document.getElementById("mainVoterID");
+  input.addEventListener("input", () => {
+    let v = input.value;
+    if (!v.startsWith("V")) v = "V";
+    input.value = "V" + v.slice(1).replace(/\D/g, "").slice(0, 3);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && input.selectionStart <= 1) e.preventDefault();
+  });
+}
+applyVoterIDLogic();
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# 🔐 Secrets
+.env*
+*.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Database (VERY IMPORTANT)
+*.frm
+*.ibd
+*.opt
+
+# Large folders
+uploads/
+faces/
+vote_receipts/
+
+# 📦 Node
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log*
+
+# Build
+build/
+dist/
+out/
+
+# Cache
+.cache/
+.npm/
+
+# IDE
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db

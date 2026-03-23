@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Face Verification | MATDAANSECURE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+      body {
+    background: white;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Changed from height to min-height */
+    color: #1e293b;
+    padding-top: 64px; /* Matches header height */
+    box-sizing: border-box;
+}
+
+/* HEADER */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px; /* Increased slightly for breathing room */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 3000;
+    box-sizing: border-box; /* Crucial to keep button inside screen */
+}
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.header-left img{
+  width:38px;
+  height:38px;
+}
+.header-left span{
+  font-size:22px;
+  font-weight:700;
+  color:#1E3A8A;
+}
+.header-right button{
+  background:#1E3A8A;
+  color:#fff;
+  border:none;
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+        /* MAIN CARD */
+        .card {
+            background: white;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h2 { margin-bottom: 8px; font-weight: 700; }
+        p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+
+        /* CAMERA CONTAINER & SCAN ANIMATION */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 24px;
+            aspect-ratio: 4/3;
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Scanning Line Effect */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            box-shadow: 0 0 15px var(--primary);
+            z-index: 10;
+            display: none;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        /* Verification Overlay */
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(16, 185, 129, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            z-index: 20;
+        }
+        #overlay i { font-size: 48px; margin-bottom: 10px; transform: scale(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .success #overlay { opacity: 1; }
+        .success #overlay i { transform: scale(1); }
+
+        /* BUTTONS */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .status-msg {
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+/* ===== ASHOKA CHAKRA BACKGROUND ===== */
+  .chakra-bg {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    opacity: 0.03;
+    z-index: -1;
+    animation: spin 40s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='/home'">←Back to Home</button>
+  </div>
+</div>
+
+<div class="card" id="mainCard">
+    <h2>Face Verification</h2>
+    <p>Please position your face clearly within the frame.</p>
+
+    <div class="video-wrapper" id="videoWrapper">
+        <div class="scanner-line" id="scannerLine"></div>
+        <div id="overlay">
+            <i class="fa-solid fa-circle-check"></i>
+            <span style="font-weight: 600;">Identity Verified</span>
+        </div>
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" hidden></canvas>
+    </div>
+
+    <button class="btn-primary" id="verifyBtn">Start Biometric Check</button>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" alt="Ashoka Chakra" class="chakra-bg">
+
+    <div class="status-msg" id="status">
+        <div class="spinner" id="loader"></div>
+        <span id="statusLabel">Initializing camera...</span>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const statusLabel = document.getElementById("statusLabel");
+    const loader = document.getElementById("loader");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const scannerLine = document.getElementById("scannerLine");
+    const videoWrapper = document.getElementById("videoWrapper");
+
+    // Simulated Voter ID check
+    const voter_id = sessionStorage.getItem("voter_id") || "DEMO_USER"; 
+
+    /* Access Camera */
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(stream => {
+            video.srcObject = stream;
+            statusLabel.innerText = "Camera ready. Align your face.";
+        })
+        .catch(err => {
+            statusLabel.innerText = "Camera access denied.";
+            statusLabel.style.color = "#ef4444";
+        });
+
+    /* VERIFY LOGIC */
+    verifyBtn.onclick = async () => {
+        // UI State: Loading
+        verifyBtn.disabled = true;
+        loader.style.display = "block";
+        statusLabel.innerText = "Analyzing facial features...";
+        scannerLine.style.display = "block";
+
+        // Capture Frame
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        const imageBase64 = canvas.toDataURL("image/jpeg");
+
+        try {
+            const response = await fetch("http://127.0.0.1:5001/verify_face", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ voter_id: voter_id, image: imageBase64 })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                handleSuccess();
+            } else {
+                handleFailure(data.message);
+            }
+        } catch (error) {
+            handleFailure("Connection error. Check server.");
+        }
+    };
+
+    function handleSuccess() {
+        scannerLine.style.display = "none";
+        loader.style.display = "none";
+        videoWrapper.classList.add("success");
+        statusLabel.innerText = "Verification Successful!";
+        statusLabel.style.color = "#10b981";
+        
+        // Final redirection
+        setTimeout(() => {
+            window.location.href = "/vote.html";
+        }, 1800);
+    }
+
+    function handleFailure(msg) {
+        scannerLine.style.display = "none";
+        loader.style.display = "none";
+        verifyBtn.disabled = false;
+        statusLabel.innerText = msg || "Face not recognized.";
+        statusLabel.style.color = "#ef4444";
+    }
+</script>
+
+</body>
+</html>

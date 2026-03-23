@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+    body{
+      background:linear-gradient(to bottom,#ffffff,#f9fafb);
+      color:#111827;
+      min-height:100vh;
+      padding-top:80px;
+    }
+    .app-header{
+      position:fixed;top:0;left:0;width:100%;height:64px;
+      background:#ffffff;display:flex;align-items:center;
+      justify-content:space-between;padding:0 16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      z-index:3000;
+    }
+    .header-left{display:flex;align-items:center;gap:12px;}
+    .header-left img{width:38px;height:38px;}
+    .header-left span{font-size:22px;font-weight:700;color:#1E3A8A;}
+    .header-right button{
+      background:#1E3A8A;color:#fff;border:none;
+      padding:8px 16px;border-radius:8px;cursor:pointer;
+    }
+
+    h1{text-align:center;color:#1E3A8A;margin-top:20px;}
+
+    .candidates-container{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:30px;
+      max-width:1200px;
+      margin:40px auto;
+    }
+
+    .candidate-card{
+      background:#ffffff;
+      border-radius:15px;
+      padding:20px;
+      text-align:center;
+      box-shadow:0 4px 12px rgba(0,0,0,0.05);
+      cursor:pointer;
+      border:2px solid transparent;
+      transition:0.2s;
+    }
+    .candidate-card:hover{
+      transform:translateY(-6px);
+      border-color:#0EA5E9;
+    }
+    .candidate-card.selected{
+      border:3px solid #1E3A8A;
+      box-shadow:0 0 15px rgba(30,58,138,0.25);
+    }
+
+    .candidate-photo{
+      width:150px;height:150px;
+      border-radius:50%;
+      overflow:hidden;
+      margin:auto;
+      border:3px solid #0EA5E9;
+    }
+    .candidate-photo img{
+      width:100%;height:100%;object-fit:cover;
+    }
+
+    .important-msg{
+      grid-column:1/-1;
+      background:#e0f2fe;
+      color:#1E3A8A;
+      padding:12px;
+      border-radius:8px;
+      border:2px solid #0EA5E9;
+      font-weight:bold;
+      text-align:center;
+    }
+
+    .submit-btn{
+      background:#1E3A8A;
+      color:white;
+      padding:12px 25px;
+      border-radius:8px;
+      border:none;
+      cursor:pointer;
+      display:block;
+      margin:20px auto;
+    }
+  </style>
+</head>
+<body>
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+<h1>Vote Your Candidates</h1>
+<div class="candidates-container" id="voteContainer">
+  <div class="important-msg">
+    ⚠️ Please select one candidate carefully before submitting your vote.
+  </div>
+</div>
+<button class="submit-btn" onclick="submitVote()">Submit Vote</button>
+<script>
+const container = document.getElementById("voteContainer");
+let candidates = [];
+let selectedCandidate = null;
+
+function normalizePhoto(photo){
+  if(!photo) return "/static/images/NOTA.jpeg";
+  return "/static/images/" + photo.split("/").pop();
+}
+
+async function fetchCandidates(){
+  try {
+    const res = await fetch("/api/candidates");
+    candidates = await res.json();
+    renderCandidates();
+  } catch (err) {
+    console.error("Failed to load candidates", err);
+  }
+}
+
+function renderCandidates(){
+  document.querySelectorAll(".candidate-card").forEach(e => e.remove());
+
+  candidates.forEach(c => {
+    const card = document.createElement("div");
+    card.className = "candidate-card";
+
+    const imgPath = normalizePhoto(c.photo);
+
+    card.innerHTML = `
+      <div class="candidate-photo">
+        <img src="${imgPath}"
+             onerror="this.onerror=null;this.src='/static/images/NOTA.jpeg';">
+      </div>
+      <h3>${c.name}</h3>
+      <p>${c.party} ${c.symbol || ""}</p>
+    `;
+
+    card.onclick = () => {
+      document.querySelectorAll(".candidate-card")
+        .forEach(x => x.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedCandidate = c;
+    };
+
+    container.appendChild(card);
+  });
+}
+
+async function submitVote(){
+  if(!selectedCandidate){
+    alert("❌ Please select a candidate");
+    return;
+  }
+
+  try {
+    const res = await fetch("/submit-vote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        candidate_id: selectedCandidate.id
+      })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+      alert("❌ " + (data.error || "Vote failed"));
+      return;
+    }
+
+    // ✅ Save the selected candidate name in localStorage
+    localStorage.setItem("votedCandidate", selectedCandidate.name);
+
+    // Redirect to Thank You page
+    window.location.href = "thankyou.html";
+
+  } catch(err){
+    alert("❌ Network error. Try again.");
+    console.error(err);
+  }
+}
+
+// ✅ load candidates on page load
+fetchCandidates();
+</script>
+
+</body>
+</html>

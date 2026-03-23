@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MATDAANSECURE | Candidate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
+
+        body {
+            background: linear-gradient(to bottom right,#ffffff,#f9fafb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            color: #111827;
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            z-index: 3000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left img {
+            width: 38px;
+            height: 38px;
+        }
+
+        .header-left span {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1E3A8A;
+        }
+
+        .header-right button {
+            background: #1E3A8A;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .container {
+            margin-top: 100px; /* FIX 5 */
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #1E3A8A;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            position: absolute;
+            width: 280px;
+            height: 380px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            text-align: center;
+            padding: 20px;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s cubic-bezier(0.25,1,0.5,1);
+        }
+
+        .card img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            object-fit: cover;
+            border: 3px solid #0EA5E9;
+        }
+
+        .card h3 {
+            color: #1E3A8A;
+            margin-bottom: 6px;
+        }
+
+        .card.active {
+            transform: scale(1.1);
+            opacity: 1;
+            z-index: 5;
+        }
+
+        .card.left {
+            transform: translateX(-260px) scale(0.95);
+            opacity: 0.8;
+            z-index: 3;
+        }
+
+        .card.right {
+            transform: translateX(260px) scale(0.95);
+            opacity: 0.8;
+            z-index: 3;
+        }
+
+        .preview-btn {
+            margin-top: 15px;
+            background: #1E3A8A;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 45px;
+            color: #0EA5E9;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .arrow.left { left: 60px; }
+        .arrow.right { right: 60px; }
+
+        .chakra-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 15cm;
+            height: 15cm;
+            opacity: 0.04;
+            z-index: 0;
+            animation: spin 40s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes spin {
+            from { transform: translate(-50%,-50%) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-header">
+    <div class="header-left">
+        <img src="{{ url_for('static', filename='images/logo.png') }}">
+        <span>MATDAANSECURE</span>
+    </div>
+    <div class="header-right">
+        <button onclick="window.location.href='/home'">← Back to Home</button>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Active Candidates For Election</h2>
+
+    <div class="carousel" id="carousel">
+        <p>Loading candidates...</p>
+    </div>
+
+    <div class="arrow left" onclick="swipe(-1)">&#10094;</div>
+    <div class="arrow right" onclick="swipe(1)">&#10095;</div>
+
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" class="chakra-bg">
+</div>
+
+<script>
+let current = 0;
+let activeCandidates = [];
+
+/* FIX 1–4: CLEAN FETCH */
+async function fetchCandidates() {
+    try {
+        const response = await fetch('/api/candidates');
+        activeCandidates = await response.json();
+        console.log("Candidates:", activeCandidates);
+        renderCards();
+    } catch (err) {
+        console.error("Fetch failed:", err);
+        document.getElementById("carousel").innerHTML = "Failed to load candidates.";
+    }
+}
+
+function renderCards() {
+    const carousel = document.getElementById("carousel");
+    carousel.innerHTML = "";
+
+    if (activeCandidates.length === 0) {
+        carousel.innerHTML = "<h3>No Active Candidates Found</h3>";
+        return;
+    }
+
+    activeCandidates.forEach((c, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="/static/images/${c.photo}" onerror="this.src='https://via.placeholder.com/150'">
+            <h3>${c.name}</h3>
+            <p>${c.party}</p>
+            <button class="preview-btn" onclick="previewCandidate(${i})">Preview</button>
+        `;
+        carousel.appendChild(card);
+    });
+
+    updateCards();
+}
+
+function updateCards() {
+    const cards = document.querySelectorAll(".card");
+    cards.forEach((card, i) => {
+        card.className = "card";
+        if (i === current) card.classList.add("active");
+        else if (i === (current - 1 + cards.length) % cards.length) card.classList.add("left");
+        else if (i === (current + 1) % cards.length) card.classList.add("right");
+    });
+}
+
+function swipe(dir) {
+    current = (current + dir + activeCandidates.length) % activeCandidates.length;
+    updateCards();
+}
+
+function previewCandidate(index) {
+    const c = activeCandidates[index];
+
+    // Convert 1 → C001, 10 → C010
+    const candidateCode = "C" + String(c.id).padStart(3, "0");
+
+    // Navigate via Flask route
+    window.location.href = `/candidate/${candidateCode}`;
+}
+
+/* START */
+fetchCandidates();
+</script>
+
+</body>
+</html>

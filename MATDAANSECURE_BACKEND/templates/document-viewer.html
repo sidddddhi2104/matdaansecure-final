@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer | MATDAANSECURE</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background: #f3f4f6; /* Subtle light gray background */
+            color: #111827;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== APP BAR ===== */
+        .app-header {
+            height: 64px;
+            background: #ffffff;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            z-index: 3000;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-left span { 
+            font-size: 20px; 
+            font-weight: 700; 
+            color: #1E3A8A; 
+            letter-spacing: -0.5px;
+        }
+
+        .header-right { display: flex; gap: 10px; }
+
+        /* ===== CONTROLS ===== */
+        .btn {
+            background: #f9fafb;
+            color: #374151;
+            border: 1.5px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            border-color: #0EA5E9;
+            color: #0EA5E9;
+            background: #fff;
+        }
+
+        .btn-primary {
+            background: #1E3A8A;
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #2563EB;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* ===== VIEWER AREA ===== */
+        .main-container {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h3 { color: #1E3A8A; font-size: 1.1rem; margin-bottom: 8px; }
+        .sidebar p { color: #6b7280; font-size: 0.85rem; line-height: 1.5; }
+
+        .viewer-window {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        #docImage {
+            max-width: 90%;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Initial shadow to make the "paper" stand out */
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Scrollbar styling for a cleaner look */
+        .viewer-window::-webkit-scrollbar { width: 8px; height: 8px; }
+        .viewer-window::-webkit-scrollbar-track { background: #f1f1f1; }
+        .viewer-window::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    </style>
+</head>
+
+<body>
+
+    <header class="app-header">
+        <div class="header-left">
+<img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+
+            <span>MATDAANSECURE</span>
+        </div>
+        
+        <div class="header-right">
+            <button class="btn" onclick="zoomIn()">Zoom +</button>
+            <button class="btn" onclick="zoomOut()">Zoom -</button>
+            <button class="btn" onclick="resetZoom()">Reset</button>
+            <button class="btn btn-primary" onclick="goBack()">Back</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>Document Intelligence</h3>
+            <p>Filename: <strong>{{ filename }}</strong></p>
+            <div style="margin-top: 20px; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+                <p style="color: #166534; font-weight: 600; font-size: 0.75rem;">✔ VERIFIED SECURE</p>
+            </div>
+            
+            <p style="margin-top: auto; font-size: 0.75rem;">
+                This document is encrypted. Any unauthorized distribution is strictly prohibited under protocol MS-2026.
+            </p>
+        </aside>
+
+        <main class="viewer-window">
+            <img id="docImage" src="/uploads/{{ filename }}" alt="Secure Document Preview">
+        </main>
+    </div>
+
+    <script>
+        let zoom = 1;
+        const img = document.getElementById("docImage");
+
+        function zoomIn() {
+            zoom += 0.2;
+            img.style.transform = `scale(${zoom})`;
+        }
+
+        function zoomOut() {
+            if (zoom > 0.4) {
+                zoom -= 0.2;
+                img.style.transform = `scale(${zoom})`;
+            }
+        }
+
+        function resetZoom() {
+            zoom = 1;
+            img.style.transform = "scale(1)";
+        }
+
+        function goBack() {
+    window.location.href = "http://127.0.0.1:5001/admin-feedback";
+}
+    </script>
+
+</body>
+</html>

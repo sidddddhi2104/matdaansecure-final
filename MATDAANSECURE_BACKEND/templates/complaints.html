@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register Complaint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    * {
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: white;
+      color:#111827;
+      margin:0;
+      padding-top:104px;
+      min-height: 100vh;
+    }
+
+    /* ===== COMMON APP BAR ===== */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      z-index: 3000;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img { width: 38px; height: 38px; }
+
+    .header-left span {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1E3A8A;
+      letter-spacing: -0.5px;
+    }
+
+    .header-right button {
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    /* BACKGROUND CHAKRA */
+    .chakra-bg {
+      position:fixed;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:15cm;
+      height:15cm;
+      opacity:0.03;
+      z-index:0;
+      animation:spin 30s linear infinite;
+      pointer-events:none;
+    }
+
+    @keyframes spin {
+      from {transform:translate(-50%,-50%) rotate(0deg);}
+      to {transform:translate(-50%,-50%) rotate(360deg);}
+    }
+
+    h1 {
+      text-align:center;
+      color:#1E3A8A;
+      margin-bottom:30px;
+      position:relative;
+      z-index:1;
+      font-weight: 800;
+    }
+
+    .container {
+      max-width:800px;
+      margin:auto;
+      background:white;
+      padding:40px;
+      border-radius:20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+      position:relative;
+      z-index:1;
+      margin-bottom: 40px;
+    }
+h2 { color: #0EA5E9; margin-bottom: 20px; font-size: 1.5rem; }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    input, select, textarea {
+      width:100%;
+      padding:12px;
+      margin-bottom:20px;
+      border:1.5px solid #e5e7eb;
+      border-radius:10px;
+      font-size:1rem;
+      transition: all 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus { 
+      border-color: #0EA5E9; 
+      outline: none; 
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); 
+    }
+
+    .submit-btn {
+      background: linear-gradient(to right, #0EA5E9, #2563EB);
+      color:white;
+      padding:16px;
+      border:none;
+      border-radius:12px;
+      font-size:1.1rem;
+      font-weight: 700;
+      cursor:pointer;
+      width: 100%;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); }
+
+    /* =========================================
+       UNIQUE ANIMATED SUCCESS POPUP
+    ========================================= */
+    .popup {
+      display:none;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      justify-content:center;
+      align-items:center;
+      z-index:4000;
+    }
+
+    .popup-content {
+      background: white;
+      width: 90%;
+      max-width: 450px;
+      padding: 40px;
+      border-radius: 30px;
+      text-align: center;
+      position: relative;
+      transform: translateY(50px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .popup.active .popup-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .success-visual {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+
+    .circle-bg { fill: none; stroke: #f0fdf4; stroke-width: 4; }
+    .circle-check {
+      fill: none;
+      stroke: #22c55e;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: drawCheck 0.8s forwards 0.3s;
+    }
+
+    @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+    .ref-box {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 25px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ref-box::after {
+      content: "";
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(14, 165, 233, 0.05), transparent);
+      transform: rotate(45deg);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+
+    .ref-code {
+      display: block;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 1.4rem;
+      color: #1E3A8A;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .copy-btn {
+      background: #111827;
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto;
+      transition: 0.3s;
+      width: 100%;
+    }
+
+    .copy-btn:hover { background: #1E3A8A; transform: scale(1.02); }
+
+    .toast {
+      position: fixed;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 50px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 5000;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show { bottom: 40px; }
+  </style>
+</head>
+
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" alt="Ashoka Chakra" class="chakra-bg">
+
+<h1>Register A Complaint</h1>
+<div class="container">
+<h2>Complaint Details</h2>
+  <form onsubmit="submitComplaint(event)">
+    <label>Complainant Name</label>
+    <input type="text" id="name1" placeholder="Enter your full name" required>
+
+    <label>Voter ID Number</label>
+    <input type="text" id="mainVoterID" value="V" maxlength="4" placeholder="V123" required>
+
+    <label>Mobile Number</label>
+    <input type="tel" id="mobile1" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" required>
+
+    <label>Email ID</label>
+    <input type="email" id="email1" placeholder="example@email.com">
+
+    <label>State</label>
+    <select id="state1" onchange="updateDistricts()" required>
+      <option value="">-- Select State --</option>
+      <option value="Maharashtra">Maharashtra</option>
+      <option value="Gujarat">Gujarat</option>
+      <option value="Karnataka">Karnataka</option>
+    </select>
+
+    <label>District</label>
+    <select id="district1" required>
+      <option value="">-- Select District --</option>
+    </select>
+
+    <label>Complaint Type *</label>
+    <select id="complaint-type" required>
+      <option value="">-- Select Complaint Category --</option>
+      <option>Voter ID Issue</option>
+      <option>OTP not Received</option>
+      <option>Voter Verification Error</option>
+      <option>Language Translation Failure</option>
+      <option>Security Concern</option>
+      <option>Did Not Received Confirmation</option>
+    </select>
+
+    <label>Complaint Description *</label>
+    <textarea id="complaint-text" placeholder="Describe your issue in detail here..." required></textarea>
+
+    <button type="submit" class="submit-btn">Submit Complaint</button>
+  </form>
+</div>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <div class="success-visual">
+      <svg viewBox="0 0 52 52">
+        <circle class="circle-bg" cx="26" cy="26" r="25"/>
+        <path class="circle-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+    </div>
+    
+    <h2 style="color:#111827; margin-bottom: 5px;">Complaint Submitted!</h2>
+    <p style="color:#64748B; font-size: 0.95rem;">Successfully registered in our system.</p>
+
+    <div class="ref-box">
+      <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 2px;">Reference Code</span>
+      <span id="displayRefCode" class="ref-code">COMP-2026-000000</span>
+    </div>
+
+    <button class="copy-btn" onclick="copyRefCode()">
+      <span>📋</span> Copy Reference Code
+    </button>
+    
+    <p onclick="location.reload()" style="margin-top:20px; cursor:pointer; font-size: 0.85rem; color: #0EA5E9; font-weight: 600;">Close & Return to Form</p>
+  </div>
+</div>
+
+<div id="toast" class="toast"><span style="color:#22c55e">✔</span> Copied to clipboard!</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const districtsByState = {
+    Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik"],
+    Gujarat: ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+    Karnataka: ["Bangalore", "Mysore", "Belagavi", "Dharwad"]
+  };
+
+  window.updateDistricts = function () {
+    const state = document.getElementById("state1").value;
+    const district = document.getElementById("district1");
+    district.innerHTML = '<option value="">-- Select District --</option>';
+    if (districtsByState[state]) {
+      districtsByState[state].forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d; opt.textContent = d;
+        district.appendChild(opt);
+      });
+    }
+  };
+
+  window.submitComplaint = function (e) {
+    e.preventDefault();
+    fetch("http://127.0.0.1:5001/submit_complaint", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        name: document.getElementById("name1").value,
+        voter_id: document.getElementById("mainVoterID").value,
+        phone: document.getElementById("mobile1").value,
+        email: document.getElementById("email1").value,
+        state: document.getElementById("state1").value,
+        district: document.getElementById("district1").value,
+        complaint_type: document.getElementById("complaint-type").value,
+        complaint: document.getElementById("complaint-text").value
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.reference_code) return;
+      window.generatedRefCode = data.reference_code;
+      document.getElementById("displayRefCode").innerText = data.reference_code;
+      const popup = document.getElementById("popup");
+      popup.style.display = "flex";
+      setTimeout(() => popup.classList.add("active"), 50);
+    })
+    .catch(() => alert("Error connecting to server"));
+  };
+});
+
+function copyRefCode() {
+  const code = window.generatedRefCode;
+  navigator.clipboard.writeText(code).then(() => {
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  });
+}
+
+function applyVoterIDLogic() {
+  const input = document.getElementById("mainVoterID");
+  input.addEventListener("input", () => {
+    let v = input.value;
+    if (!v.startsWith("V")) v = "V";
+    input.value = "V" + v.slice(1).replace(/\D/g, "").slice(0, 3);
+  });
+  input.addEventListener("keydown", (e) => {
+    if ((e.key === "Backspace") && input.selectionStart <= 1) e.preventDefault();
+  });
+}
+applyVoterIDLogic();
+</script>
+
+</body>
+</html>

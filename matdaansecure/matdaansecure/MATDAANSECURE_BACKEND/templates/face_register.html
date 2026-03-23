@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Face Registration | MATDAANSECURE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* BASE STYLING */
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body{
+  background:#f8fafc;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding-top:90px;
+  padding-bottom: 40px;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+.app-header{
+  position:fixed;
+  top:0; left:0; width:100%; height:64px;
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  z-index:3000;
+}
+.header-left{ display:flex; align-items:center; gap:12px; }
+.header-left img{ width:38px; height:38px; }
+.header-left span{ font-size:22px; font-weight:700; color:#1E3A8A; }
+.header-right button{ background:#1E3A8A; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight: 600; }
+
+/* CARD */
+.card{
+  background:#ffffff;
+  width:100%;
+  max-width:520px;
+  padding:40px;
+  border-radius:28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  text-align:center;
+  position: relative;
+}
+
+h2{ color:#1e3a8a; font-size: 26px; margin-bottom: 4px; }
+.subtitle{ color:#64748b; font-size:14px; margin-bottom:24px; }
+
+/* STEPPER */
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  padding: 0 10px;
+}
+.step {
+  font-size: 13px;
+  font-weight: 700;
+  color: #cbd5e1;
+  transition: color 0.3s;
+}
+.step.active { color: #2563eb; }
+.step.done { color: #16a34a; }
+
+/* INSTRUCTIONS */
+.instruction-box {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border-left: 4px solid #cbd5e1;
+}
+.instruction-box.ready { border-left-color: #22c55e; background: #f0fdf4; }
+
+/* CAMERA AREA */
+.camera-box{
+  position:relative;
+  height:360px;
+  border-radius:24px;
+  overflow:hidden;
+  background:black;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+video{ width:100%; height:100%; object-fit:cover; transition: filter 0.3s; }
+
+/* SCAN LINE ANIMATION */
+.scan-line {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 4px;
+  background: linear-gradient(to bottom, transparent, #2563eb, transparent);
+  box-shadow: 0 0 15px #2563eb;
+  z-index: 10;
+  display: none;
+  animation: scan 1.5s ease-in-out infinite;
+}
+@keyframes scan {
+  0% { top: 10%; }
+  50% { top: 90%; }
+  100% { top: 10%; }
+}
+
+.face-guide {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 230px; height: 290px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-radius: 150px;
+  box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.7);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+.face-guide.valid { border: 4px solid #22c55e; box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.4); }
+
+/* BUTTONS & STATUS */
+.status{ margin-top:20px; font-size:14px; font-weight:700; color:#64748b; }
+.primary-btn {
+  width:100%; padding:16px; margin-top:20px; border:none; border-radius:16px;
+  background:#2563eb; color:white; font-size:16px; font-weight: 700;
+  cursor:pointer; transition: 0.2s;
+}
+.primary-btn:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); }
+.primary-btn:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; }
+
+/* SUCCESS OVERLAY */
+.success-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  z-index: 4000; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+.success-overlay.show { opacity: 1; pointer-events: all; }
+.checkmark-circle {
+  width: 100px; height: 100px; border-radius: 50%; background: #16a34a;
+  display: flex; align-items: center; justify-content: center;
+  transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.success-overlay.show .checkmark-circle { transform: scale(1); }
+
+/* FLASH EFFECT */
+.flash-effect { animation: flash 0.4s ease-out; }
+@keyframes flash {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(2.5); }
+  100% { filter: brightness(1); }
+}
+
+.footer-text { font-size:12px; color:#94a3b8; margin-top:15px; }
+</style>
+</head>
+
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='/home'">← Back</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Identity Setup</h2>
+  <p class="subtitle">Please complete the biometric verification</p>
+
+  <div class="stepper">
+    <div class="step active" id="s1">1. Position</div>
+    <div class="step" id="s2">2. Verify</div>
+    <div class="step" id="s3">3. Complete</div>
+  </div>
+
+  <div class="instruction-box" id="instruction">
+    Align your face within the oval guide
+  </div>
+
+  <div class="camera-box">
+    <div id="scan-line" class="scan-line"></div>
+    <video id="video" autoplay muted playsinline></video>
+    <div id="face-guide" class="face-guide"></div>
+  </div>
+
+  <div class="status" id="status">Initializing...</div>
+
+  <button id="registerBtn" class="primary-btn" onclick="captureFace()" disabled>
+    Complete Registration
+  </button>
+
+  <p class="footer-text">🔒 Encrypted Biometric Registration</p>
+  <canvas id="canvas" hidden></canvas>
+</div>
+
+<div id="successOverlay" class="success-overlay">
+    <div class="checkmark-circle">
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </div>
+    <h2 style="margin-top:20px;">Identity Secured</h2>
+    <p style="color:#64748b;">Biometric data has been encrypted and saved.</p>
+</div>
+
+<script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<script>
+let video, statusText, registerBtn, instruction, faceGuide;
+let registrationInProgress = false;
+let livenessVerified = false;
+
+const params = new URLSearchParams(window.location.search);
+const voter_id = params.get("voter_id");
+
+window.onload = async () => {
+  video = document.getElementById("video");
+  statusText = document.getElementById("status");
+  registerBtn = document.getElementById("registerBtn");
+  instruction = document.getElementById("instruction");
+  faceGuide = document.getElementById("face-guide");
+
+  try {
+    await faceapi.nets.tinyFaceDetector.loadFromUri("/static/models");
+    await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/static/models");
+
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user", width: 640, height: 480 } 
+    });
+    video.srcObject = stream;
+    video.play();
+    
+    statusText.innerText = "Camera Ready";
+    startDetection();
+  } catch (err) {
+    statusText.innerText = "Camera Error";
+    instruction.innerText = "Please enable camera permissions";
+  }
+};
+
+function startDetection() {
+  video.addEventListener("play", () => {
+    let initialX = null;
+    let movementCount = 0;
+
+    setInterval(async () => {
+      if (livenessVerified || registrationInProgress) return;
+
+      const detection = await faceapi
+        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks(true);
+
+      if (!detection) {
+        resetPosition();
+        return;
+      }
+
+      const box = detection.detection.box;
+      const faceCenterX = box.x + (box.width / 2);
+      const faceCenterY = box.y + (box.height / 2);
+      const videoCenterX = video.videoWidth / 2;
+      const videoCenterY = video.videoHeight / 2;
+
+      const isCentered = Math.abs(faceCenterX - videoCenterX) < 55 && Math.abs(faceCenterY - videoCenterY) < 55;
+      const isCloseEnough = box.width > 130;
+
+      if (isCentered && isCloseEnough) {
+        faceGuide.classList.add("valid");
+        document.getElementById("s1").className = "step done";
+        document.getElementById("s2").className = "step active";
+        instruction.innerText = "Step 2: Slowly turn your head left and right";
+        instruction.classList.add("ready");
+        statusText.style.color = "#ca8a04";
+
+        const nose = detection.landmarks.positions[30];
+        if (initialX === null) {
+            initialX = nose.x;
+        } else {
+            const diff = nose.x - initialX;
+            if (Math.abs(diff) > 20) {
+                movementCount++;
+                initialX = nose.x;
+                statusText.innerText = `Verifying Liveness... ${Math.min(100, Math.round((movementCount/3)*100))}%`;
+            }
+        }
+
+        if (movementCount >= 3) {
+            livenessVerified = true;
+            document.getElementById("s2").className = "step done";
+            document.getElementById("s3").className = "step active";
+            statusText.innerText = "Liveness Verified ✔";
+            statusText.style.color = "#16a34a";
+            instruction.innerText = "Verification Complete! You can now register.";
+            registerBtn.disabled = false;
+        }
+      } else {
+        resetPosition();
+      }
+    }, 200);
+  });
+}
+
+function resetPosition() {
+    faceGuide.classList.remove("valid");
+    document.getElementById("s1").className = "step active";
+    document.getElementById("s2").className = "step";
+    instruction.innerText = "Position your face inside the oval";
+    instruction.classList.remove("ready");
+    statusText.innerText = "Awaiting correct alignment...";
+    statusText.style.color = "#64748b";
+}
+
+function captureFace() {
+  if (registrationInProgress) return;
+  registrationInProgress = true;
+  registerBtn.disabled = true;
+
+  // Visual Effects
+  const scanLine = document.getElementById("scan-line");
+  scanLine.style.display = "block";
+  video.classList.add("flash-effect");
+  statusText.innerText = "Processing Biometrics...";
+
+  const canvas = document.getElementById("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+
+  fetch("/face-register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ voter_id, image: canvas.toDataURL("image/jpeg") })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      scanLine.style.display = "none";
+      document.getElementById("successOverlay").classList.add("show");
+      setTimeout(() => { window.location.href = "/login"; }, 3000);
+    } else {
+      statusText.innerText = data.message;
+      statusText.style.color = "#ef4444";
+      scanLine.style.display = "none";
+      video.classList.remove("flash-effect");
+      registrationInProgress = false;
+      registerBtn.disabled = false;
+    }
+  })
+  .catch(err => {
+      statusText.innerText = "Server connection failed";
+      registrationInProgress = false;
+      registerBtn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>

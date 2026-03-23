@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You | MATDAANSECURE</title>
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --accent: #0EA5E9;
+      --success: #10B981;
+    }
+
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #ffffff;
+      color: #111827;
+      min-height: 100vh;
+      padding-top: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ===== APP HEADER (Logic untouched) ===== */
+    .app-header {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 64px;
+      background: #ffffff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      z-index: 3000;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-left img { width: 38px; height: 38px; }
+    .header-left span { font-size: 22px; font-weight: 700; color: var(--primary); }
+    .header-right button {
+      background: var(--primary); color: #ffffff; border: none;
+      padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    }
+
+    /* ===== THE ASHOKA CHAKRA ===== */
+    .chakra-bg {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16cm; height: 16cm;
+      opacity: 0.05;
+      animation: spin 25s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes spin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ===== THANK YOU CARD ===== */
+    .thankyou-box {
+      background: #ffffff;
+      padding: 50px 60px;
+      border-radius: 24px;
+      box-shadow: 0 15px 45px rgba(30, 58, 138, 0.1);
+      border: 1px solid #f1f5f9;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      max-width: 500px;
+      transition: all 0.5s ease;
+    }
+
+    /* ===== SHIELD ANIMATION OVERLAY ===== */
+    .shield-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 24px;
+    }
+
+    .shield-icon {
+      font-size: 60px;
+      color: var(--accent);
+      position: relative;
+      animation: shieldPulse 1.5s ease-out infinite;
+    }
+
+    /* Ripple effects for the shield */
+    .shield-icon::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 60px; height: 60px;
+      background: rgba(14, 165, 233, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 1.5s ease-out infinite;
+    }
+
+    @keyframes shieldPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px var(--accent)); }
+      50% { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--accent)); }
+    }
+
+    @keyframes ripple {
+      from { width: 60px; height: 60px; opacity: 1; }
+      to { width: 200px; height: 200px; opacity: 0; }
+    }
+
+    /* State Class */
+    .verifying .shield-overlay { display: flex; }
+
+    /* ===== BUTTONS & TEXT ===== */
+    h1 { color: var(--primary); font-size: 32px; margin-bottom: 20px; font-weight: 800; }
+    p { font-size: 18px; color: #4b5563; line-height: 1.6; }
+    b { color: var(--accent); font-weight: 700; background: #f0f9ff; padding: 2px 8px; border-radius: 5px; }
+
+    .download-btn {
+      margin-top: 35px; width: 100%; padding: 18px;
+      background: var(--primary); color: white; border: none;
+      border-radius: 15px; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+    }
+    .download-btn:hover { background: #1e40af; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(30,58,138,0.2); }
+    .download-btn:active { transform: translateY(-1px); }
+
+    .status-badge {
+      display: inline-block; padding: 6px 12px; border-radius: 20px;
+      background: #ecfdf5; color: #10b981; font-weight: 700; font-size: 14px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='home'">← Back to Home</button>
+  </div>
+</div>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" class="chakra-bg" alt="Ashoka Chakra">
+
+<div class="thankyou-box" id="thankyouBox">
+  <div class="shield-overlay">
+    <div class="shield-icon">🛡️</div>
+    <p style="margin-top: 20px; font-weight: 700; color: var(--primary);">Cryptographically Signing Receipt...</p>
+  </div>
+
+  <div class="status-badge">VOTE RECORDED ✅</div>
+  <h1>Success!</h1>
+  <p>Your contribution to the democratic process has been safely stored.</p>
+  <p style="margin-top: 10px;">Voted for: <b id="candidateName">...</b></p>
+
+  <button class="download-btn" id="dlBtn" onclick="handleVerifyAndDownload()">
+    <span id="btnIcon">📄</span>
+    <span id="btnText">Download Official Vote Proof</span>
+  </button>
+
+  <p style="margin-top:25px; font-size:13px; color:#94a3b8;">
+    Receipt generated on: <span id="currentDate"></span>
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+  // Logic
+  const candidate = localStorage.getItem("votedCandidate");
+  document.getElementById("candidateName").textContent = candidate || "Unknown Candidate";
+  document.getElementById("currentDate").textContent = new Date().toLocaleString();
+  
+  function downloadReceipt() {
+    window.location.href = "/preview-vote-receipt";
+  }
+
+  async function handleVerifyAndDownload() {
+    const box = document.getElementById("thankyouBox");
+    const btnText = document.getElementById("btnText");
+    const btnIcon = document.getElementById("btnIcon");
+
+    // 1. Trigger Shield Verification Animation
+    box.classList.add("verifying");
+    
+    // 2. Delay to simulate "signing" process
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // 3. Update UI to success state
+    box.classList.remove("verifying");
+    btnText.innerText = "Receipt Ready!";
+    btnIcon.innerText = "✅";
+
+    // 4. Trigger logic
+    setTimeout(() => {
+        downloadReceipt();
+        // Reset button for UI consistency
+        setTimeout(() => {
+            btnText.innerText = "Download Official Vote Proof";
+            btnIcon.innerText = "📄";
+        }, 3000);
+    }, 600);
+  }
+
+  // Celebrate on Load
+  window.onload = () => {
+    confetti({ 
+      particleCount: 150, 
+      spread: 70, 
+      origin: { y: 0.6 }, 
+      colors: ['#1E3A8A', '#0EA5E9', '#10B981'] 
+    });
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Voters</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== RESET ===== */
+* {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+body {
+  background: linear-gradient(to bottom, #ffffff, #f9fafb);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #111827;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ===== ASHOKA CHAKRA ===== */
+.chakra-bg {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15cm; height: 15cm;
+  opacity: 0.04;
+  z-index: 0;
+  animation: spin 25s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+/* ===== COMMON APP BAR ===== */
+  .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;   /* ⬅ reduce from 24px */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 3000;
+  box-sizing: border-box; /* ⬅ VERY IMPORTANT */
+}
+
+
+    .header-left{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img{
+      width: 38px;
+      height: 38px;
+    }
+
+    .header-left span{
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E3A8A;
+    }
+
+    .header-right button{
+      background: #1E3A8A;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .header-right button:hover{
+      background: #2563EB;
+    }
+/* ===== VIEW BUTTON ===== */
+.view-btn {
+  background: #1E3A8A;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+/* ===== TITLE ===== */
+h1 {
+  color: #1E3A8A;
+  text-align: center;
+  margin-top: 70px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+/* ===== PROFESSIONAL MODAL ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 5000;
+  left: 0; 
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+  background: #ffffff;
+  margin: 6% auto;
+  width: 480px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  background: #1E3A8A;
+  color: white;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.close-btn {
+  font-size: 22px;
+  cursor: pointer;
+  color: #ffffff;
+  transition: 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #EF4444;
+}
+
+.modal-body {
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+  font-size: 15px;
+  color: #111827;
+}
+
+.modal-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-item span.label {
+  font-size: 13px;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.modal-item span.value {
+  font-weight: 600;
+  color: #111827;
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.status-voted {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.status-notvoted {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+.export-btn {
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s ease;
+}
+
+.export-btn:hover {
+  background: #047857;
+}
+/* ===== STATS SECTION ===== */
+.stats-container {
+  width: 90%;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 15px;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stat {
+  text-align: center;
+  font-size: 17px;
+  color: #1E3A8A;
+}
+.stat span {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0EA5E9;
+  margin-top: 5px;
+  text-shadow: 0 1px 4px rgba(14,165,233,0.2);
+}
+.voted { color: green; }
+.not-voted { color: #EF4444; }
+
+/* ===== CONTROLS ===== */
+.controls-container {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.search-box input, .dropdown {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.search-box input:focus, .dropdown:focus {
+  border-color: #0EA5E9;
+  box-shadow: 0 0 6px rgba(14,165,233,0.3);
+  outline: none;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 90%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin: 20px auto;
+  background: transparent;
+  font-size: 17px;
+  z-index: 2;
+}
+table th {
+  background: #1E3A8A;
+  color: white;
+  padding: 14px;
+  border-radius: 10px 10px 0 0;
+  text-align: center;
+  font-weight: 600;
+}
+table td {
+  background: white;
+  border: none;
+  padding: 12px;
+  text-align: center;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+table tr:hover td {
+  background: #f0f9ff;
+  transform: scale(1.01);
+  box-shadow: 0 2px 6px rgba(14,165,233,0.15);
+}
+
+/* ===== PAGINATION ===== */
+#pagination {
+  margin: 20px;
+}
+.page-btn {
+  background: #0EA5E9;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  margin: 0 4px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.page-btn:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+}
+.page-btn.active {
+  background: #1E3A8A;
+  box-shadow: 0 3px 6px rgba(30,58,138,0.4);
+}
+
+/* ===== ANIMATIONS ===== */
+.fade {
+  animation: fadeIn 0.6s ease-in-out;
+}
+</style>
+</head>
+<body>
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MATDAANSECURE">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <span>MATDAANSECURE</span>
+  </div>
+  <div class="header-right">
+    <button onclick="window.location.href='admin-dashboard'">← Back to Home</button>
+  </div>
+</div>
+
+<!-- Ashoka Chakra -->
+<div class="chakra-bg">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Ashoka_Chakra.svg/2048px-Ashoka_Chakra.svg.png" 
+       width="100%" height="100%">
+</div>
+<!-- Title -->
+<h1>🗳️ Manage Voters</h1>
+
+<!-- Stats -->
+<div class="stats-container">
+  <div class="stat">Total Voters<span id="totalCount">0</span></div>
+</div>
+
+<!-- Search & Filters -->
+<div class="controls-container">
+  <div class="search-box" style="flex:1 1 60%;">
+    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="🔍 Search by Name, Email, Voter ID, or Phone">
+  </div>
+  <select id="sortSelect" class="dropdown" onchange="sortAlpha()">
+    <option value="">Sort Default (A-Z)</option>
+    <option value="asc">Name A → Z</option>
+    <option value="desc">Name Z → A</option>
+  </select>
+ </div>
+<button onclick="exportCSV()" class="export-btn">⬇ Export CSV</button>
+<!-- Table -->
+<table id="voterTable" class="fade">
+  <thead>
+    <tr>
+      <th>Voter ID</th>
+      <th>Name</th>
+      <th>Phone</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+<!-- VIEW VOTER MODAL -->
+<div id="viewModal" class="modal">
+  <div class="modal-content">
+    
+    <div class="modal-header">
+      <h2>Voter Profile</h2>
+      <span class="close-btn" onclick="closeModal()">×</span>
+    </div>
+
+    <div class="modal-body" id="modalBody"></div>
+
+  </div>
+</div>
+<!-- Pagination -->
+<div id="pagination"></div>
+
+<script>
+let voters = [];
+let votersOriginal = [];
+let currentPage = 1;
+const rowsPerPage = 7;
+
+async function fetchVoters() {
+  try {
+    const res = await fetch("http://127.0.0.1:5001/admin/api/voters");
+    const json = await res.json();
+
+    if (!json.success) throw new Error("Failed to load voters");
+
+    votersOriginal = json.data.map(v => ({
+  id: v.voterID,
+  name: v.fullname,
+  email: v.email,
+  phone: v.phone,
+  gender: v.gender,
+  age: v.age,
+  userType: v.user_type
+}));
+
+    voters = [...votersOriginal];
+    displayTable(1);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("tableBody").innerHTML =
+      `<tr><td colspan="5">⚠️ Failed to load voters</td></tr>`;
+  }
+}
+
+function updateStats(data) {
+  document.getElementById('totalCount').textContent = data.length;
+}
+
+function displayTable(page, data = voters) {
+  currentPage = page;
+  const tableBody = document.getElementById('tableBody');
+  tableBody.innerHTML = '';
+
+  let start = (page - 1) * rowsPerPage;
+  let end = start + rowsPerPage;
+  let paginated = data.slice(start, end);
+
+  paginated.forEach((v, index) => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${v.id}</td>
+        <td>${v.name}</td>
+        <td>${v.phone}</td>
+        <td>
+          <button class="view-btn" onclick="viewVoter(${start + index})">
+            View
+          </button>
+        </td>
+      </tr>`;
+  });
+
+  updateStats(data);
+  displayPagination(data);
+}
+function viewVoter(index) {
+  let voter = voters[index];
+
+  
+  document.getElementById("modalBody").innerHTML = `
+    <div class="modal-item">
+      <span class="label">Full Name</span>
+      <span class="value">${voter.name}</span>
+    </div>
+
+    <div class="modal-item">
+      <span class="label">Voter ID</span>
+      <span class="value">${voter.id}</span>
+    </div>
+
+    <div class="modal-item">
+      <span class="label">Email</span>
+      <span class="value">${voter.email}</span>
+    </div>
+
+    <div class="modal-item">
+      <span class="label">Phone</span>
+      <span class="value">${voter.phone}</span>
+    </div>
+
+    <div class="modal-item">
+      <span class="label">Gender</span>
+      <span class="value">${voter.gender || 'N/A'}</span>
+    </div>
+
+    <div class="modal-item">
+      <span class="label">Age</span>
+      <span class="value">${voter.age || 'N/A'}</span>
+    </div>
+
+    <div class="modal-item">
+      <span class="label">User Type</span>
+      <span class="value">${voter.userType || 'Voter'}</span>
+    </div>
+  `;
+
+  document.getElementById("viewModal").style.display = "block";
+}
+function closeModal() {
+  document.getElementById("viewModal").style.display = "none";
+}
+
+function displayPagination(data) {
+  const pagination = document.getElementById('pagination');
+  pagination.innerHTML = '';
+  let totalPages = Math.ceil(data.length / rowsPerPage);
+
+  for (let i = 1; i <= totalPages; i++) {
+    pagination.innerHTML +=
+      `<button class="page-btn ${i === currentPage ? 'active' : ''}"
+        onclick="displayTable(${i})">${i}</button>`;
+  }
+}
+
+function sortAlpha() {
+  let sort = document.getElementById('sortSelect').value;
+  if (sort === 'asc') voters.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sort === 'desc') voters.sort((a,b)=>b.name.localeCompare(a.name));
+  else voters = [...votersOriginal];
+  displayTable(1);
+}
+
+function filterTable() {
+  let query = document.getElementById('searchInput').value.toLowerCase();
+
+  let filtered = voters.filter(v =>
+     v.id.toLowerCase().includes(query) ||
+     v.name.toLowerCase().includes(query) ||
+     v.email.toLowerCase().includes(query) ||
+     v.phone.includes(query)
+  );
+
+  displayTable(1, filtered);
+}
+function exportCSV() {
+  let csv = "Voter ID,Full Name,Email,Phone,Gender,Age,User Type\n";
+
+  voters.forEach(v => {
+    csv += `${v.id},${v.name},${v.email},${v.phone},${v.gender},${v.age},${v.userType}\n`;
+  });
+
+  let blob = new Blob([csv], { type: 'text/csv' });
+  let url = window.URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "MATDAANSECURE_Voters.csv";
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+}
+fetchVoters();
+</script>
+</body>
+</html>
