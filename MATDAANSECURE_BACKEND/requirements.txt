@@ -9,3 +9,4 @@ gunicorn
 face-recognition
 dlib
 opencv-python
+reportlab
